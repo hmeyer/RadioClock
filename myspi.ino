@@ -7,7 +7,10 @@
 #endif
 #ifndef sbi
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif 
+#endif
+
+uint8_t SPIBufferCount;
+volatile uint8_t *SPIBuffer;
 
 void SPIsetup(void) {
   UBRR0 = 0;
@@ -17,7 +20,10 @@ void SPIsetup(void) {
   sbi(UCSR0C, UDORD0); // LSBFirst
   cbi(UCSR0C, UCPHA0); // Data Mode
   cbi(UCSR0C, UCPOL0); // Data Mode
-  sbi(UCSR0B, TXEN0); 
+  sbi(UCSR0B, TXEN0);  // Enable Transmit
+  cbi(UCSR0B, UDRIE0);  // Disable Data Empty Interupt
+
+
   UBRR0 = 0; // max Speed
 }
 
@@ -27,8 +33,18 @@ void SPItransfer(uint8_t data) {
 }
 
 void SPItransferBufferReverse(volatile uint8_t *data, uint8_t count) {
-  do {
-    count--;
-    SPItransfer(data[count]);
-  } while(count);
+  SPIBuffer = data;
+  SPIBufferCount = count;
+  SPIBufferCount--;
+  uint8_t value = data[SPIBufferCount];
+  while( !(UCSR0A & _BV(UDRE0)) );
+  sbi(UCSR0B, UDRIE0);
+  UDR0 = value;
 }
+
+ISR(USART_UDRE_vect) {
+  --SPIBufferCount;
+  UDR0 = SPIBuffer[SPIBufferCount];
+  if (!SPIBufferCount) cbi(UCSR0B, UDRIE0);
+}
+
