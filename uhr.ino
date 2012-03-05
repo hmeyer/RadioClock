@@ -1,11 +1,8 @@
 #include "TimerOne.h"
 #include "character.h"
-#include "SPI.h"
 
 
 //#define DEBUG 
-
-
 #include "display.h"
 
 
