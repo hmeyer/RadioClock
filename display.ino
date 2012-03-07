@@ -1,4 +1,5 @@
-
+#include <avr/interrupt.h>
+#include <avr/io.h>
 #include "myspi.h"
 
 #define redMask 0b01010101
@@ -12,13 +13,13 @@ volatile byte bits = 0;
 
 #define COL_D 11
 #define LINE_CLK 13
-#define COL_OE 9
-#define COL_ST 8
+#define COL_OE 2
+#define COL_ST 3
 
-#define ROW_OE 3
-#define ROW_ST 5
+#define ROW_OE 8
+#define ROW_ST 7
 #define ROW_D 6
-#define ROW_CP 7
+#define ROW_CP 5
 
 volatile byte displayBuff[3 * XRES * 2];
 volatile byte drawBuff[3 * XRES * 2];
@@ -28,6 +29,11 @@ volatile uint8_t switchBuffersFlag=0;
 
 volatile byte line = 255;
 volatile byte lineiters = 0;
+
+
+#define MStoCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
+const uint16_t DisplayTimerCycles[] = {MStoCYCLES(110), MStoCYCLES(200), MStoCYCLES(400)};
+
 
 #ifdef DEBUG
 void dumpBuffer(volatile byte *buffer, byte rg=0) { // 0=both, 1=red, 2=green
@@ -58,8 +64,8 @@ void dumpBuffer(volatile byte *buffer, byte rg=0) { // 0=both, 1=red, 2=green
 void getCopperBars(uint8_t *color, uint16_t t) {
   for(int y=0;y<8;y++) {
     uint8_t mask = 0;
-    uint16_t tg = (-t+y*7)*7;
-    uint16_t tr = (t+y*9)*5;
+    uint16_t tg = (-t+y*3)*13;
+    uint16_t tr = (t+y*5)*11;
     uint8_t vg = cosine[ tg & 255 ]>>6;
     uint8_t vr = cosine[ tr & 255 ]>>6;
     mask |= (vg<<2) | vr;
@@ -149,6 +155,27 @@ inline signed char drawString(volatile byte *buffer, signed char pos, const char
 
 void rowshift(boolean v);
 
+void setDisplayTimer(uint8_t iteration) {
+  uint16_t cycles = DisplayTimerCycles[iteration];
+  cli();
+  ICR1 = cycles;
+  sei();
+}
+
+void initDisplayTimer(void) {
+  TCCR1A = 0;                 // clear control register A 
+  TCCR1B = _BV(WGM13);        // set mode 8: phase and frequency correct pwm, stop the timer
+  
+  setDisplayTimer(2);
+  TIMSK1 = _BV(TOIE1);// sets the timer overflow interrupt enable bit
+
+  // Set Clock Prescaler to NO Prescaler
+  uint8_t clockSelectBits = _BV(CS10);
+  TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
+  TCCR1B |= clockSelectBits;   
+}
+
+
 inline void setupDisplay(void) {
   pinMode(COL_D, OUTPUT);
   pinMode(LINE_CLK, OUTPUT);
@@ -169,6 +196,7 @@ inline void setupDisplay(void) {
     rowshift(true);
   }
   digitalWrite(ROW_OE, true);
+  initDisplayTimer();
 }
 
 
@@ -202,7 +230,11 @@ inline void storeLine(boolean stat=true) {
 #endif
 }
 
-void displayCallback() {
+
+
+
+//void displayCallback() {
+ISR(TIMER1_OVF_vect) {
 #ifdef DEBUG
     Serial.println("displayCallback");
 #endif
@@ -210,6 +242,7 @@ void displayCallback() {
   storeLine();
   if (!lineiters) rowshift(line != 0);
   lineenable();
+  setDisplayTimer(lineiters);
 
   lineiters++;
   if (lineiters == 3) {

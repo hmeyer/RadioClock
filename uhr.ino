@@ -1,4 +1,3 @@
-#include "TimerOne.h"
 #include "character.h"
 
 
@@ -13,10 +12,7 @@ uint8_t colorbars[8];
 void setup() {
 #ifndef DEBUG
   setupDisplay();
-  Timer1.initialize(200);
-  Timer1.attachInterrupt(displayCallback);
 #else
-  Timer1.initialize(10000);
   Serial.begin(19200);
   Serial.println("start");
 #endif
