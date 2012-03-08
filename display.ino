@@ -62,6 +62,18 @@ void dumpBuffer(volatile byte *buffer, byte rg=0) { // 0=both, 1=red, 2=green
 }
 #endif
 
+#define linedisable() digitalWrite(COL_OE, false)
+#define lineenable() digitalWrite(COL_OE, true)
+#define storeLine(stat) digitalWrite(COL_ST, stat)
+
+#define rowshift(v) \
+  if (v)\
+    digitalWrite(ROW_D, 1);\
+  else \
+    digitalWrite(ROW_D, 0);\
+  digitalWrite(ROW_CP, 1);\
+  digitalWrite(ROW_CP, 0);
+
 void getCopperBars(uint8_t *color, uint16_t t) {
   for(int y=0;y<8;y++) {
     uint8_t mask = 0;
@@ -154,14 +166,11 @@ inline signed char drawString(volatile byte *buffer, signed char pos, const char
 }
 
 
-void rowshift(boolean v);
-
-void setDisplayTimer(uint8_t iteration) {
-  uint16_t cycles = DisplayTimerCycles[iteration];
-  ATOMIC_BLOCK(ATOMIC_FORCEON) {
-    ICR1 = cycles;
+#define setDisplayTimer(iteration) \
+  uint16_t cycles = DisplayTimerCycles[iteration];\
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {\
+    ICR1 = cycles;\
   }  
-}
 
 void initDisplayTimer(void) {
   TCCR1A = 0;                 // clear control register A 
@@ -201,35 +210,12 @@ inline void setupDisplay(void) {
 }
 
 
-inline void linedisable(void) {
-  digitalWrite(COL_OE, false);
-}
 
-inline void lineenable(void) {
-  digitalWrite(COL_OE, true);
-}
 
-inline void rowshift(boolean v) {
-  if (v)
-    digitalWrite(ROW_D, 1);
-  else 
-    digitalWrite(ROW_D, 0);
-  digitalWrite(ROW_CP, 1);
-  digitalWrite(ROW_CP, 0);
-}  
-
-inline void fillLineShift(void) {
-  volatile byte *linebuffer = &(displayBuffer[ lineiters * XRES*2 + line*XRES/4]);
-#ifndef DEBUG
+#define fillLineShift() \
+  volatile byte *linebuffer = &(displayBuffer[ lineiters * XRES*2 + line*XRES/4]);\
   SPItransferBufferReverse(linebuffer, XRES/4);
-#endif
-}
 
-inline void storeLine(boolean stat=true) {
-#ifndef DEBUG
-  digitalWrite(COL_ST, stat);
-#endif
-}
 
 
 
@@ -240,7 +226,7 @@ ISR(TIMER1_OVF_vect) {
     Serial.println("displayCallback");
 #endif
   linedisable();
-  storeLine();
+  storeLine(true);
   if (!lineiters) rowshift(line != 0);
   lineenable();
   setDisplayTimer(lineiters);
