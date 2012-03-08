@@ -22,8 +22,6 @@ void SPIsetup(void) {
   cbi(UCSR0C, UCPOL0); // Data Mode
   sbi(UCSR0B, TXEN0);  // Enable Transmit
   cbi(UCSR0B, UDRIE0);  // Disable Data Empty Interupt
-
-
   UBRR0 = 0; // max Speed
 }
 

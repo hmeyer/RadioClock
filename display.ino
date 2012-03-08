@@ -1,5 +1,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <util/atomic.h>
 #include "myspi.h"
 
 #define redMask 0b01010101
@@ -32,7 +33,7 @@ volatile byte lineiters = 0;
 
 
 #define MStoCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
-const uint16_t DisplayTimerCycles[] = {MStoCYCLES(110), MStoCYCLES(200), MStoCYCLES(400)};
+const uint16_t DisplayTimerCycles[] = {MStoCYCLES(90), MStoCYCLES(180), MStoCYCLES(360)};
 
 
 #ifdef DEBUG
@@ -157,9 +158,9 @@ void rowshift(boolean v);
 
 void setDisplayTimer(uint8_t iteration) {
   uint16_t cycles = DisplayTimerCycles[iteration];
-  cli();
-  ICR1 = cycles;
-  sei();
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ICR1 = cycles;
+  }  
 }
 
 void initDisplayTimer(void) {
