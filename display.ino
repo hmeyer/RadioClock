@@ -33,7 +33,7 @@ volatile byte lineiters = 0;
 
 
 #define MStoCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
-const uint16_t DisplayTimerCycles[] = {MStoCYCLES(90), MStoCYCLES(180), MStoCYCLES(360)};
+const uint16_t DisplayTimerCycles[] = {MStoCYCLES(85), MStoCYCLES(170), MStoCYCLES(340)};
 
 
 #ifdef DEBUG
