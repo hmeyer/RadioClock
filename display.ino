@@ -66,13 +66,14 @@ void dumpBuffer(volatile byte *buffer, byte rg=0) { // 0=both, 1=red, 2=green
 #define lineenable() digitalWrite(COL_OE, true)
 #define storeLine(stat) digitalWrite(COL_ST, stat)
 
-#define rowshift(v) \
+#define rowshift(v) {\
   if (v)\
     digitalWrite(ROW_D, 1);\
   else \
     digitalWrite(ROW_D, 0);\
   digitalWrite(ROW_CP, 1);\
-  digitalWrite(ROW_CP, 0);
+  digitalWrite(ROW_CP, 0);\
+}
 
 void getCopperBars(uint8_t *color, uint16_t t) {
   for(int y=0;y<8;y++) {
