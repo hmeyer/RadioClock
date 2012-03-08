@@ -168,7 +168,6 @@ void initDisplayTimer(void) {
   TCCR1B = _BV(WGM13);        // set mode 8: phase and frequency correct pwm, stop the timer
   
   setDisplayTimer(2);
-  sei();
   TIMSK1 = _BV(TOIE1);// sets the timer overflow interrupt enable bit
 
   // Set Clock Prescaler to NO Prescaler
