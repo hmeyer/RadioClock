@@ -116,6 +116,166 @@ Character( // 9 = 9
 "@   @"
 " @@@ "
 ),
+Character( // 10 = A
+"XXXX "
+"X   X"
+"X   X"
+"XXXXX"
+"X   X"
+"X   X"
+"X   X"
+"X   X"
+),
+Character( // 11 = B
+"XXX  "
+"X  X "
+"X  X "
+"XXXX "
+"X   X"
+"X   X"
+"X   X"
+"XXXX "
+),
+Character( // 12 = C
+" XXX "
+"X   X"
+"X    "
+"X    "
+"X    "
+"X    "
+"X   X"
+" XXX "
+),
+Character( // 13 = D
+"XXX  "
+"X  X "
+"X   X"
+"X   X"
+"X   X"
+"X   X"
+"X   X"
+"XXXX "
+),
+Character( // 14 = E
+" XXXX"
+"X    "
+"X    "
+"XXXX "
+"X    "
+"X    "
+"X    "
+"XXXXX"
+),
+Character( // 15 = F
+" XXXX"
+"X    "
+"X    "
+"XXX  "
+"X    "
+"X    "
+"X    "
+"X    "
+),
+Character( // 16 = G
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 17 = H
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 18 = I
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 19 = J
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 20 = K
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 21 = L
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 22 = M
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 23 = N
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 24 = O
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
+Character( // 25 = P
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+"     "
+),
 Character( // 10 = invalid
 "@@@@@"
 "@   @"
