@@ -1,6 +1,10 @@
 #include <avr/interrupt.h>
-#include <avr/io.h>
+#include <stdint.h>
 #include <util/atomic.h>
+#include <avr/pgmspace.h>
+#include "display.h"
+#include "wiring.h"
+#include "character.h"
 #include "myspi.h"
 
 #define redMask 0b01010101
@@ -10,7 +14,7 @@
 
 
 volatile long ledcntr = 0;
-volatile byte bits = 0;
+volatile uint8_t bits = 0;
 
 #define COL_D 11
 #define LINE_CLK 13
@@ -22,46 +26,19 @@ volatile byte bits = 0;
 #define ROW_D 6
 #define ROW_CP 5
 
-volatile byte displayBuff[3 * XRES * 2];
-volatile byte drawBuff[3 * XRES * 2];
+volatile uint8_t displayBuff[3 * XRES * 2];
+volatile uint8_t drawBuff[3 * XRES * 2];
 volatile uint8_t *displayBuffer = displayBuff;
 volatile uint8_t *drawBuffer = drawBuff;
 volatile uint8_t switchBuffersFlag=0;
 
-volatile byte line = 255;
-volatile byte lineiters = 0;
+volatile uint8_t line = 255;
+volatile uint8_t lineiters = 0;
 
 
 #define usToCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
 #define cyclesTOus(cycles) ((uint32_t)(cycles * 2000000) / F_CPU)
 const uint16_t DisplayTimerCycles[] = {usToCYCLES(85), usToCYCLES(170), usToCYCLES(340)};
-
-
-#ifdef DEBUG
-void dumpBuffer(volatile byte *buffer, byte rg=0) { // 0=both, 1=red, 2=green
-  for(int y=0; y < 8; y++) {
-    byte b;
-    if (!rg)
-      for(int x=0; x < XRES*2; x++) {
-        if ((x&7) == 0) {
-          b = buffer[ y*XRES/4 + x/8 ];
-        }
-        Serial.write( (b&128)?'@':'.' );
-        b <<= 1;
-      }
-    else 
-      for(int x=0; x < XRES; x++) {
-        if ((x&3) == 0) {
-          b = buffer[ y*XRES/4 + x/4 ];
-          if (rg==1) b<<=1;
-        }
-        Serial.write( (b&128)?'@':'.' );
-        b <<= 2;
-      }
-    Serial.println("");
-  }
-}
-#endif
 
 #define linedisable() digitalWrite(COL_OE, false)
 #define lineenable() digitalWrite(COL_OE, true)
@@ -81,8 +58,8 @@ void getCopperBars(uint8_t *color, uint16_t t) {
     uint8_t mask = 0;
     uint16_t tg = (-t+y*3)*13;
     uint16_t tr = (t+y*5)*11;
-    uint8_t vg = cosine[ tg & 255 ]>>6;
-    uint8_t vr = cosine[ tr & 255 ]>>6;
+    uint8_t vg = cosine(tg & 255)>>6;
+    uint8_t vr = cosine(tr & 255)>>6;
     mask |= (vg<<2) | vr;
     color[y] = mask;
   }
@@ -110,29 +87,28 @@ void colorBar(volatile uint8_t *buffer, const uint8_t *color) { // higher bits =
 }
 
 
-inline void clearBuffer(volatile byte *buffer) {
-  for(byte i=0;i < XRES * 2;i++)
+void clearBuffer(volatile uint8_t *buffer) {
+  for(uint8_t i=0;i < XRES * 2;i++)
     buffer[i]=0;
 }
 
-inline void drawChar(volatile byte *buffer, signed char &pos, byte charIdx) {
+void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
 #ifdef DEBUG
   Serial.print("drawChar:"); Serial.println(pos);
 #endif
   const signed char width = 5;
   if ((pos > -width) && (pos < XRES)) {
     signed char bufferIndex = ((pos+4) / 4) - 1;
-    byte bitOffset = (pos*2+8) & 7;
-    boolean upperLimit = !((bufferIndex+1) >= (XRES/4));
-    boolean lowerLimit = (bufferIndex >= 0);
-    const byte *character = charset[charIdx];
+    uint8_t bitOffset = (pos*2+8) & 7;
+    bool upperLimit = !((bufferIndex+1) >= (XRES/4));
+    bool lowerLimit = (bufferIndex >= 0);
 #ifdef DEBUG
   Serial.print("bufferIndex:"); Serial.println(bufferIndex);
 #endif
-    for(byte y=0;y<8;y++) {
-      byte charByte = character[y];
-      byte highB = mono2HighColorByte(charByte);
-      byte lowB = mono2LowColorByte(charByte);
+    for(uint8_t y=0;y<8;y++) {
+      uint8_t charByte = charset(charIdx, y);
+      uint8_t highB = mono2HighColorByte(charByte);
+      uint8_t lowB = mono2LowColorByte(charByte);
       if (lowerLimit) buffer[ bufferIndex ] |= highB >> bitOffset;
       if (upperLimit) {
         if (bitOffset) buffer[ bufferIndex + 1 ] |= highB << (8-bitOffset);
@@ -144,12 +120,12 @@ inline void drawChar(volatile byte *buffer, signed char &pos, byte charIdx) {
   pos += width+1;
 }
 
-inline signed char drawString(volatile byte *buffer, signed char pos, const char *string) {
+signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string) {
 #ifdef DEBUG
     Serial.println("drawString:");
 #endif
   while(*string!=0 && pos < XRES) {
-    byte charIdx = 10;
+    uint8_t charIdx = 10;
 #ifdef DEBUG
     Serial.print(pos);
     Serial.print(":");
@@ -188,7 +164,7 @@ void initDisplayTimer(void) {
 }
 
 
-inline void setupDisplay(void) {
+void setupDisplay(void) {
   pinMode(COL_D, OUTPUT);
   pinMode(LINE_CLK, OUTPUT);
   pinMode(COL_OE, OUTPUT);
@@ -215,7 +191,7 @@ inline void setupDisplay(void) {
 
 
 #define fillLineShift() \
-  volatile byte *linebuffer = &(displayBuffer[ lineiters * XRES*2 + line*XRES/4]);\
+  volatile uint8_t *linebuffer = &(displayBuffer[ lineiters * XRES*2 + line*XRES/4]);\
   SPItransferBufferReverse(linebuffer, XRES/4);
 
 
@@ -240,7 +216,7 @@ ISR(TIMER1_OVF_vect) {
     if ( line == 8 ) {
       line = 0;
       if (switchBuffersFlag) {
-        volatile byte *t = drawBuffer;
+        volatile uint8_t *t = drawBuffer;
         drawBuffer = displayBuffer;
         displayBuffer = t;
         switchBuffersFlag = 0;

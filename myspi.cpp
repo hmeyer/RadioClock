@@ -2,6 +2,10 @@
 // Clock: PD4 - Arduino D4
 // Output:  PD1 - Arduino D1
 
+#include <stdint.h>
+#include <avr/interrupt.h>
+#include "wiring.h"
+
 #ifndef cbi
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #endif

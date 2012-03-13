@@ -1,0 +1,7 @@
+*.ii
+*.s
+*.o
+*.d
+uhr.map
+uhr.elf
+uhr.hex
