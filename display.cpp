@@ -16,12 +16,9 @@
 volatile long ledcntr = 0;
 volatile uint8_t bits = 0;
 
-#define COL_D 11
-#define LINE_CLK 13
 #define COL_OE 2
 #define COL_ST 3
 
-#define ROW_OE 8
 #define ROW_ST 7
 #define ROW_D 6
 #define ROW_CP 5
@@ -38,7 +35,7 @@ volatile uint8_t lineiters = 0;
 
 #define usToCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
 #define cyclesTOus(cycles) ((uint32_t)(cycles * 2000000) / F_CPU)
-const uint16_t DisplayTimerCycles[] = {usToCYCLES(85), usToCYCLES(170), usToCYCLES(340)};
+const uint16_t DisplayTimerCycles[] = {usToCYCLES(100), usToCYCLES(200), usToCYCLES(400)};
 
 #define linedisable() digitalWrite(COL_OE, false)
 #define lineenable() digitalWrite(COL_OE, true)
@@ -93,18 +90,12 @@ void clearBuffer(volatile uint8_t *buffer) {
 }
 
 void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
-#ifdef DEBUG
-  Serial.print("drawChar:"); Serial.println(pos);
-#endif
   const signed char width = 5;
   if ((pos > -width) && (pos < XRES)) {
     signed char bufferIndex = ((pos+4) / 4) - 1;
     uint8_t bitOffset = (pos*2+8) & 7;
     bool upperLimit = !((bufferIndex+1) >= (XRES/4));
     bool lowerLimit = (bufferIndex >= 0);
-#ifdef DEBUG
-  Serial.print("bufferIndex:"); Serial.println(bufferIndex);
-#endif
     for(uint8_t y=0;y<8;y++) {
       uint8_t charByte = charset(charIdx, y);
       uint8_t highB = mono2HighColorByte(charByte);
@@ -121,25 +112,13 @@ void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
 }
 
 signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string) {
-#ifdef DEBUG
-    Serial.println("drawString:");
-#endif
   while(*string!=0 && pos < XRES) {
     uint8_t charIdx = 10;
-#ifdef DEBUG
-    Serial.print(pos);
-    Serial.print(":");
-    Serial.print(*string);
-    Serial.print(" ");
-#endif
     if (*string >= '0' && *string <= '9')
       charIdx = *string - '0';
     drawChar( buffer, pos, charIdx);
     string++;
   }
-#ifdef DEBUG
-    Serial.println();
-#endif
   return pos;
 }
 
@@ -165,17 +144,13 @@ void initDisplayTimer(void) {
 
 
 void setupDisplay(void) {
-  pinMode(COL_D, OUTPUT);
-  pinMode(LINE_CLK, OUTPUT);
   pinMode(COL_OE, OUTPUT);
   pinMode(COL_ST, OUTPUT);
   digitalWrite(COL_OE, false);
   digitalWrite(COL_ST, false);
   pinMode(ROW_D, OUTPUT);
   pinMode(ROW_CP, OUTPUT);
-  pinMode(ROW_OE, OUTPUT);
   pinMode(ROW_ST, OUTPUT);
-  digitalWrite(ROW_OE, false);
   digitalWrite(ROW_ST, true);
   
   SPIsetup();
@@ -183,7 +158,6 @@ void setupDisplay(void) {
     SPItransfer(0);
     rowshift(true);
   }
-  digitalWrite(ROW_OE, true);
   initDisplayTimer();
 }
 
@@ -200,9 +174,6 @@ void setupDisplay(void) {
 
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
-#ifdef DEBUG
-    Serial.println("displayCallback");
-#endif
   linedisable();
   storeLine(true);
   if (!lineiters) rowshift(line != 0);
