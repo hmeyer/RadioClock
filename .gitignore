@@ -2,6 +2,7 @@
 *.s
 *.o
 *.d
-uhr.map
-uhr.elf
-uhr.hex
+*.swp
+*.map
+*.elf
+*.hex
