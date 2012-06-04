@@ -59,6 +59,7 @@ void getCopperBars(uint8_t *color, uint16_t t) {
     uint8_t vr = cosine(tr & 255)>>6;
     mask |= (vg<<2) | vr;
     color[y] = mask;
+    color[y] = 12;
   }
 }
 
@@ -68,14 +69,17 @@ void colorBar(volatile uint8_t *buffer, const uint8_t *color) { // higher bits =
     volatile uint8_t *fillbuffer = &(buffer[XRES*2*i]);
     for(uint8_t y=0; y < 8; y++) {
       uint8_t col = color[y];
-      uint8_t bgmask = 0, fgmask = 0;
-      if ((col >> 6) >  i) bgmask |= greenMask;
-      if (((col >> 4)&3) >  i) bgmask |= redMask;
-      if (((col >> 2)&3) >  i) fgmask |= greenMask;
-      if (((col)&3) >  i) fgmask |= redMask;
-      for(uint8_t x=0; x < XRES/4; x++) {
+      uint8_t fgred = 0, fggreen =  0, bgred = 0, bggreen = 0;
+      if (( col       & 3)       > i) fgred = 0xff;
+      if (((col >> 2) & 3) > i) fggreen = 0xff;
+      if (((col >> 4) & 3) > i) bgred = 0xff;
+      if ( (col >> 6)      > i) bggreen = 0xff;
+      uint8_t x2 = XRES/8;
+      for(uint8_t x=0; x < XRES/8; x++) {
         uint8_t val = lookupbuffer[x];
-        fillbuffer[x] = (val & fgmask) | ((~val)&bgmask);
+	fillbuffer[x] = (val & fgred) | ((~val) & bgred);
+	fillbuffer[x2] = (val & fggreen) | ((~val) & bggreen);
+	x2++;
       }
       lookupbuffer+=XRES/4;
       fillbuffer+=XRES/4;
@@ -92,20 +96,17 @@ void clearBuffer(volatile uint8_t *buffer) {
 void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
   const signed char width = 5;
   if ((pos > -width) && (pos < XRES)) {
-    signed char bufferIndex = ((pos+4) / 4) - 1;
-    uint8_t bitOffset = (pos*2+8) & 7;
-    bool upperLimit = !((bufferIndex+1) >= (XRES/4));
+    signed char bufferIndex = pos >> 3;
+    uint8_t bitOffset = pos & 7;
+    bool upperLimit = !((bufferIndex+1) >= (XRES/8));
     bool lowerLimit = (bufferIndex >= 0);
     for(uint8_t y=0;y<8;y++) {
       uint8_t charByte = charset(charIdx, y);
-      uint8_t highB = mono2HighColorByte(charByte);
-      uint8_t lowB = mono2LowColorByte(charByte);
-      if (lowerLimit) buffer[ bufferIndex ] |= highB >> bitOffset;
-      if (upperLimit) {
-        if (bitOffset) buffer[ bufferIndex + 1 ] |= highB << (8-bitOffset);
-        buffer[ bufferIndex+1 ] |= lowB >> bitOffset;
+      if (lowerLimit) buffer[ bufferIndex ] |= charByte >> bitOffset;
+      if (bitOffset && upperLimit) {
+        buffer[ bufferIndex + 1 ] |= charByte << (8-bitOffset);
       }
-      bufferIndex += XRES/4;
+      bufferIndex += 2 * (XRES/8);
     }
   }
   pos += width+1;

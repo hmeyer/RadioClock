@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define XRES 40
+#define XRES 8
 extern volatile uint8_t *drawBuffer;
 extern volatile uint8_t switchBuffersFlag;
 void setupDisplay(void);
