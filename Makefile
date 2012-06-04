@@ -18,8 +18,8 @@
 # HFUSE			Targer device configuration fuses, high byte.
 # EFUSE			Target device configuration fuses (extended).
 
-PROGRAM		= uhr
-OBJECTS		= uhr.o display.o myspi.o wiring.o
+PROGRAM		= radioclock
+OBJECTS		= radioclock.o display.o myspi.o wiring.o
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
