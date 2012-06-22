@@ -16,12 +16,12 @@
 volatile long ledcntr = 0;
 volatile uint8_t bits = 0;
 
-#define COL_OE 2
 #define COL_ST 3
 
-#define ROW_ST 7
-#define ROW_D 6
-#define ROW_CP 5
+#define ROW_ST 16
+#define ROW_D 15
+#define ROW_CP 14
+#define ROW_OE 17
 
 volatile uint8_t displayBuff[3 * XRES * 2];
 volatile uint8_t drawBuff[3 * XRES * 2];
@@ -31,14 +31,18 @@ volatile uint8_t switchBuffersFlag=0;
 
 volatile uint8_t line = 255;
 volatile uint8_t lineiters = 0;
+volatile uint32_t globalMS = 0;
 
 
-#define usToCYCLES(microseconds) ((uint16_t)(F_CPU / 2000000) * microseconds)
-#define cyclesTOus(cycles) ((uint32_t)(cycles * 2000000) / F_CPU)
-const uint16_t DisplayTimerCycles[] = {usToCYCLES(100), usToCYCLES(200), usToCYCLES(400)};
+#define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
+const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
 
-#define linedisable() digitalWrite(COL_OE, false)
-#define lineenable() digitalWrite(COL_OE, true)
+inline void LEDdisable() {
+	digitalWrite(ROW_OE, false);
+}
+inline void LEDenable() {
+	digitalWrite(ROW_OE, true);
+}
 #define storeLine(stat) digitalWrite(COL_ST, stat)
 
 #define rowshift(v) {\
@@ -59,7 +63,6 @@ void getCopperBars(uint8_t *color, uint16_t t) {
     uint8_t vr = cosine(tr & 255)>>6;
     mask |= (vg<<2) | vr;
     color[y] = mask;
-    color[y] = 12;
   }
 }
 
@@ -128,7 +131,8 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
   uint16_t cycles = DisplayTimerCycles[iteration];\
   ATOMIC_BLOCK(ATOMIC_FORCEON) {\
     ICR1 = cycles;\
-  }  
+  }\ 
+  globalMS += cycles/8;
 
 void initDisplayTimer(void) {
   TCCR1A = 0;                 // clear control register A 
@@ -145,9 +149,9 @@ void initDisplayTimer(void) {
 
 
 void setupDisplay(void) {
-  pinMode(COL_OE, OUTPUT);
+  pinMode(ROW_OE, OUTPUT);
+  LEDdisable();
   pinMode(COL_ST, OUTPUT);
-  digitalWrite(COL_OE, false);
   digitalWrite(COL_ST, false);
   pinMode(ROW_D, OUTPUT);
   pinMode(ROW_CP, OUTPUT);
@@ -175,10 +179,10 @@ void setupDisplay(void) {
 
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
-  linedisable();
+  LEDdisable();
   storeLine(true);
   if (!lineiters) rowshift(line != 0);
-  lineenable();
+  LEDenable();
   setDisplayTimer(lineiters);
 
   lineiters++;

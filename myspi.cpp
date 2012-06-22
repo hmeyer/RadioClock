@@ -38,10 +38,9 @@ void SPItransferBufferReverse(volatile uint8_t *data, uint8_t count) {
   SPIBuffer = data;
   SPIBufferCount = count;
   SPIBufferCount--;
-  uint8_t value = data[SPIBufferCount];
-  while( !(UCSR0A & _BV(UDRE0)) );
+//  while( !(UCSR0A & _BV(UDRE0)) );
+  UDR0 = data[SPIBufferCount];
   sbi(UCSR0B, UDRIE0);
-  UDR0 = value;
 }
 
 ISR(USART_UDRE_vect) {

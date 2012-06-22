@@ -12,7 +12,9 @@ int main() {
   while(1) {
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  drawString(drawBuffer, 8-((t/3)%70), "0123456789");
+	  char mystring[] = "08";
+	  *mystring = ((globalMS/1000000)%10)+'0';
+	  drawString(drawBuffer, 0, mystring);
 	  getCopperBars( colorbars, t/4 );
 	  colorBar(drawBuffer, colorbars);
 	  switchBuffersFlag = 1;
