@@ -12,10 +12,6 @@
 #define orangeMask (redMask|greenMask)
 
 
-
-volatile long ledcntr = 0;
-volatile uint8_t bits = 0;
-
 #define COL_ST 3
 
 #define ROW_ST 16
@@ -30,7 +26,7 @@ volatile uint8_t *drawBuffer = drawBuff;
 volatile uint8_t switchBuffersFlag=0;
 
 volatile uint8_t line = 255;
-volatile uint8_t lineiters = 0;
+volatile uint8_t frame = 0;
 volatile uint32_t globalMS = 0;
 
 
@@ -127,12 +123,13 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
 }
 
 
-#define setDisplayTimer(iteration) \
-  uint16_t cycles = DisplayTimerCycles[iteration];\
-  ATOMIC_BLOCK(ATOMIC_FORCEON) {\
-    ICR1 = cycles;\
-  }\ 
+inline void setDisplayTimer(uint8_t iteration) {
+  uint16_t cycles = DisplayTimerCycles[iteration];
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ICR1 = cycles;
+  } 
   globalMS += cycles/8;
+}
 
 void initDisplayTimer(void) {
   TCCR1A = 0;                 // clear control register A 
@@ -169,9 +166,10 @@ void setupDisplay(void) {
 
 
 
-#define fillLineShift() \
-  volatile uint8_t *linebuffer = &(displayBuffer[ lineiters * XRES*2 + line*XRES/4]);\
+inline void fillLineShift(void) {
+  volatile uint8_t *linebuffer = &(displayBuffer[ frame * (XRES*2) + line * (XRES/5)]);\
   SPItransferBufferReverse(linebuffer, XRES/4);
+}
 
 
 
@@ -181,16 +179,16 @@ void setupDisplay(void) {
 ISR(TIMER1_OVF_vect) {
   LEDdisable();
   storeLine(true);
-  if (!lineiters) rowshift(line != 0);
+  rowshift(line != 0);
   LEDenable();
-  setDisplayTimer(lineiters);
+  if (!line) setDisplayTimer(frame);
 
-  lineiters++;
-  if (lineiters == 3) {
-    lineiters = 0;
-    line++; 
-    if ( line == 8 ) {
-      line = 0;
+  line++;
+  if (line == 8) {
+    line = 0;
+    frame++; 
+    if ( frame == 3 ) {
+      frame = 0;
       if (switchBuffersFlag) {
         volatile uint8_t *t = drawBuffer;
         drawBuffer = displayBuffer;
