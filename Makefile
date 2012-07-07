@@ -50,10 +50,7 @@ LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref
 SIZE	= avr-size -C --mcu=$(DEVICE)
 
 
-%.d: %.cpp
-	$(SHELL) -ec "$(CXX) -M $(CPPFLAGS) $< | sed \"s/$*.o/& $@/g\" > $@"
 
-include $(OBJECTS:.o=.d)
 
 # symbolic targets:
 all:	$(PROGRAM).hex
@@ -80,8 +77,11 @@ clean:
 $(PROGRAM).elf: $(OBJECTS)
 	$(COMPILE) -o $@ $(OBJECTS) $(LDFLAGS)
 
-%.o: 
+-include $(OBJECTS:.o=.d)
+
+%.o: %.cpp
 	$(COMPILE) -c $< -o $@
+	$(SHELL) -ec "$(CXX) -MM $(CPPFLAGS) $*.cpp > $*.d"
 
 # Targets for code debugging and analysis:
 disasm:	$(PROGRAM).elf
