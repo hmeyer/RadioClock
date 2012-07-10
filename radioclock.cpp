@@ -13,7 +13,7 @@ int main() {
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  char mystring[] = "08";
-	  *mystring = ((globalMS/1000000)%10)+'0';
+	  *mystring = ((globaluS/1000000)%10)+'0';
 	  drawString(drawBuffer, 0, mystring);
 	  getCopperBars( colorbars, t/4 );
 	  colorBar(drawBuffer, colorbars);

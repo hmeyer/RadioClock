@@ -27,7 +27,7 @@ volatile uint8_t switchBuffersFlag=0;
 
 volatile uint8_t line = 255;
 volatile uint8_t frame = 0;
-volatile uint32_t globalMS = 0;
+volatile uint32_t globaluS = 0;
 
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
@@ -114,8 +114,11 @@ void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
 signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string) {
   while(*string!=0 && pos < XRES) {
     uint8_t charIdx = 10;
-    if (*string >= '0' && *string <= '9')
-      charIdx = *string - '0';
+    char c = *string;
+    if (c >= 20 && c <= 127)
+      charIdx = c - 20;
+    else charIdx = 127;
+      
     drawChar( buffer, pos, charIdx);
     string++;
   }
@@ -127,8 +130,10 @@ inline void setDisplayTimer(uint8_t iteration) {
   uint16_t cycles = DisplayTimerCycles[iteration];
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
     ICR1 = cycles;
-  } 
-  globalMS += cycles/8;
+  }
+  uint32_t us = cycles;
+  us /= F_CPU / (8* 2000000);
+  globaluS += us;
 }
 
 void initDisplayTimer(void) {
