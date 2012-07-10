@@ -1,4 +1,5 @@
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include <stdint.h>
 #include <util/atomic.h>
 #include <avr/pgmspace.h>
@@ -34,6 +35,7 @@ volatile uint32_t globaluS = 0;
 const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
 
 inline void LEDdisable() {
+	wdt_reset();
 	digitalWrite(ROW_OE, false);
 }
 inline void LEDenable() {
@@ -166,6 +168,7 @@ void setupDisplay(void) {
     rowshift(true);
   }
   initDisplayTimer();
+  wdt_enable( WDTO_500MS );
 }
 
 
