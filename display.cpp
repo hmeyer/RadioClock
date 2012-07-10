@@ -167,8 +167,8 @@ void setupDisplay(void) {
 
 
 inline void fillLineShift(void) {
-  volatile uint8_t *linebuffer = &(displayBuffer[ frame * (XRES*2) + line * (XRES/5)]);\
-  SPItransferBufferReverse(linebuffer, XRES/4);
+  volatile uint8_t *linebuffer = &(displayBuffer[ frame * (XRES*2) + line * (2 * XRES / 8)]);\
+  SPItransferBufferReverse(linebuffer, 2 * XRES / 8);
 }
 
 
