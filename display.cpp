@@ -34,12 +34,18 @@ volatile uint32_t globaluS = 0;
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
 const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
 
-inline void LEDdisable() {
+inline void LEDdisable_Clock() {
 	wdt_reset();
 	digitalWrite(ROW_OE, false);
+	digitalWrite(ROW_CP, 0);\
 }
-inline void LEDenable() {
+inline void LEDenableShift_Clock(bool v) {
+	if (v)
+		digitalWrite(ROW_D, 1);
+	else
+		digitalWrite(ROW_D, 0);
 	digitalWrite(ROW_OE, true);
+	digitalWrite(ROW_CP, 1);
 }
 #define storeLine(stat) digitalWrite(COL_ST, stat)
 
@@ -60,7 +66,7 @@ void getCopperBars(uint8_t *color, uint16_t t) {
     uint8_t vg = cosine(tg & 255)>>6;
     uint8_t vr = cosine(tr & 255)>>6;
     mask |= (vg<<2) | vr;
-    color[y] = mask;
+    color[y] =15; mask;
   }
 }
 
@@ -154,7 +160,8 @@ void initDisplayTimer(void) {
 
 void setupDisplay(void) {
   pinMode(ROW_OE, OUTPUT);
-  LEDdisable();
+  LEDenableShift_Clock(true);
+  LEDdisable_Clock();
   pinMode(COL_ST, OUTPUT);
   digitalWrite(COL_ST, false);
   pinMode(ROW_D, OUTPUT);
@@ -185,10 +192,9 @@ inline void fillLineShift(void) {
 
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
-  LEDdisable();
+  LEDdisable_Clock();
   storeLine(true);
-  rowshift(line != 0);
-  LEDenable();
+  LEDenableShift_Clock(line != 0);
   if (!line) setDisplayTimer(frame);
 
   line++;
