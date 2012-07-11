@@ -117,9 +117,9 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
   while(*string!=0 && pos < XRES) {
     uint8_t charIdx = 10;
     char c = *string;
-    if (c >= 20 && c <= 127)
-      charIdx = c - 20;
-    else charIdx = 127;
+    if (c >= 32 && c <= 127)
+      charIdx = c - 32;
+    else charIdx = 127 - 32;
       
     drawChar( buffer, pos, charIdx);
     string++;
