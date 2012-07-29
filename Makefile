@@ -19,7 +19,7 @@
 # EFUSE			Target device configuration fuses (extended).
 
 PROGRAM		= radioclock
-OBJECTS		= radioclock.o display.o myspi.o wiring.o
+OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
