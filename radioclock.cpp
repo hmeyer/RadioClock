@@ -4,25 +4,36 @@
 #include "switch.h"
 
 
-uint16_t t = XRES;
+uint16_t t = 0;
 uint8_t colorbars[8];
+int8_t bcnt = 0;
 
 int main() {
   setupDisplay();
   setupSwitch();
+  uint16_t stop=0;
 
+  char mystring[] = "08";
   while(1) {
   	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  char mystring[] = "08";
-	  *mystring = ((globaluS/1000000)%10)+'0';
-	  if (switchPressed(SW_F_UP)) *mystring = 'U';
-	  if (switchPressed(SW_F_DOWN)) *mystring = 'D';
-	  if (switchPressed(SW_F_LEFT)) *mystring = 'L';
-	  if (switchPressed(SW_F_RIGHT)) *mystring = 'R';
-	  if (switchPressed(SW_F_PUSH)) *mystring = 'P';
-	  
+	  if (!stop) *mystring = ((globaluS/1000000)%10)+'0';
+	  else stop--;
+
+	  char bChar=0;
+
+	  if (switchPressed(SW_F_UP)) bChar = 'U';
+	  if (switchPressed(SW_F_DOWN)) bChar = 'D';
+	  if (switchPressed(SW_F_LEFT)) bChar = 'L';
+	  if (switchPressed(SW_F_RIGHT)) bChar = 'R';
+	  if (switchPressed(SW_F_PUSH)) bChar = 'P';
+	  if (bChar =='L') { *mystring=(--bcnt)+'0'; stop = 200; }
+	  else if (bChar =='R') { *mystring=(++bcnt)+'0'; stop = 200; }
+	  else if (bChar =='P') { *mystring=(bcnt)+'0'; stop = 200; }
+	  else if (bChar) { *mystring = bChar; stop = 200; }
+
+
 	  drawString(drawBuffer, 0, mystring);
 	  getCopperBars( colorbars, t/4 );
 	  colorBar(drawBuffer, colorbars);
