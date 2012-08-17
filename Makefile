@@ -19,10 +19,10 @@
 # EFUSE			Target device configuration fuses (extended).
 
 PROGRAM		= radioclock
-OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o
+OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o uart.o
 DEVICE		= atmega328p
 BAUDRATE	= 115200
-CLOCK		= 16000000
+CLOCK		= 16000000UL
 #PROGRAMMER	= usbtiny
 #PROGRAMMER	= avrispmkII
 PROGRAMMER	= arduino
@@ -40,7 +40,7 @@ PORT		= /dev/ttyUSB0
 # Tune the lines below only if you know what you are doing:
 
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
-CXX = avr-g++
+CXX = avr-gcc
 COMPILE = $(CXX) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize
 
 # Linker options
@@ -78,6 +78,10 @@ $(PROGRAM).elf: $(OBJECTS)
 	$(COMPILE) -o $@ $(OBJECTS) $(LDFLAGS)
 
 -include $(OBJECTS:.o=.d)
+
+uart.o: uart.c
+	$(COMPILE) -c $< -o $@
+	$(SHELL) -ec "$(CXX) -MM $(CPPFLAGS) $*.c > $*.d"
 
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@

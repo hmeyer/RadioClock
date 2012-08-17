@@ -2,6 +2,7 @@
 #include "display.h"
 #include "wiring.h"
 #include "switch.h"
+#include "uart.h"
 
 
 uint16_t t = 0;
@@ -14,7 +15,17 @@ int main() {
   uint16_t stop=0;
 
   char mystring[] = "08";
+  stream_init();
+
+    char input;
+
+    while(1) {
+        puts("Hello world!");
+        input = getchar();
+        printf("You wrote %c\n", input);        
+    }
   while(1) {
+	printf("hallo\n");
   	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
