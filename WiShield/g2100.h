@@ -210,7 +210,6 @@ enum {
 #define ZG_MAX_PMK_LEN				32
 
 #define ZG_SECURITY_TYPE_NONE	0
-#define ZG_SECURITY_TYPE_WEP	1
 #define ZG_SECURITY_TYPE_WPA	2
 #define ZG_SECURITY_TYPE_WPA2	3
 

@@ -19,7 +19,8 @@
 # EFUSE			Target device configuration fuses (extended).
 
 PROGRAM		= radioclock
-OBJECTS		= radioclock.o display.o myspi.o wiring.o
+#WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
+OBJECTS		= radioclock.o character.o display.o myspi.o wiring.o wifi.o $(WISHIELD_OBJS:%=WiShield/%)
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
@@ -27,6 +28,7 @@ CLOCK		= 16000000
 #PROGRAMMER	= avrispmkII
 PROGRAMMER	= arduino
 PORT		= /dev/ttyUSB0
+TOP := $(shell pwd)
 
 # Fuse configuration:
 # For a really nice guide to AVR fuses, see http://www.engbedded.com/fusecalc/
@@ -41,7 +43,9 @@ PORT		= /dev/ttyUSB0
 
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
 CXX = avr-g++
+CC = avr-gcc
 COMPILE = $(CXX) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize
+COMPILEC = $(CC) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
 
 # Linker options
 LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
@@ -68,7 +72,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) 
 
 # file targets:
 %.hex: %.elf
@@ -82,6 +86,10 @@ $(PROGRAM).elf: $(OBJECTS)
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@
 	$(SHELL) -ec "$(CXX) -MM $(CPPFLAGS) $*.cpp > $*.d"
+
+%.o: %.c
+	$(COMPILEC) -c $< -o $@
+	$(SHELL) -ec "$(CC) -MM $(CFLAGS) -I. $*.c > $*.d"
 
 # Targets for code debugging and analysis:
 disasm:	$(PROGRAM).elf

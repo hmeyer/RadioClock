@@ -42,50 +42,9 @@
 
 #include "clock-arch.h"
 
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "wiring.h"
-#endif
+#include "display.h"
 
-#if 0
-//Counted time
-clock_time_t clock_datetime = 0;
-
-//Overflow interrupt
-ISR(TIMER0_OVF_vect)
-{
-	clock_datetime += 1;
-	TIFR0 |= (1<<TOV0);
-}
-*/
-
-//Initialise the clock
-void clock_init(){
-	//Activate overflow interrupt for timer0
-	TIMSK0 |= (1<<TOIE0);
-
-	//Use prescaler 1024
-	TCCR0B |= ((1<<CS12)|(1<<CS10));
-
-	//Activate interrupts
-	sei();
-}
-
-//Return time
-clock_time_t clock_time(){
-	clock_time_t time;
-
-	cli();
-	time = clock_datetime;
-	sei();
-
-	return time;
-}
-#endif
-
-//Return time
 clock_time_t clock_time()
 {
-	return millis();
+	return globalmS;
 }

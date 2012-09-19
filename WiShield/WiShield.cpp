@@ -44,19 +44,26 @@ extern "C" {
   void stack_process(void);
 }
 
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
 #include "WiShield.h"
+#include <avr/interrupt.h>
+
+ISR(INT0_vect) {
+	zg_isr();
+}
+
+inline void enableINT0(int mode) {
+      EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+      EIMSK |= (1 << INT0);
+}
+
 
 void WiShield::init()
 {
 	zg_init();
 
 #ifdef USE_DIG0_INTR
-	attachInterrupt(0, zg_isr, LOW);
+//	attachInterrupt(0, zg_isr, LOW);
+	enableINT0(0);
 #endif
 
 #ifdef USE_DIG8_INTR
