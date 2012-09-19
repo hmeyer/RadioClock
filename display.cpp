@@ -7,6 +7,7 @@
 #include "wiring.h"
 #include "character.h"
 #include "myspi.h"
+#include "bits.h"
 
 #define redMask 0b01010101
 #define greenMask (redMask<<1)
@@ -14,6 +15,7 @@
 
 
 #define COL_ST 3
+#define COL_CLK 4
 
 #define ROW_ST 16
 #define ROW_D 15
@@ -40,14 +42,23 @@ inline void LEDdisable_Clock() {
 	digitalWrite(ROW_CP, 0);\
 }
 inline void LEDenableShift_Clock(bool v) {
-	if (v)
-		digitalWrite(ROW_D, 1);
-	else
-		digitalWrite(ROW_D, 0);
+	digitalWrite(ROW_D, v);
 	digitalWrite(ROW_OE, true);
 	digitalWrite(ROW_CP, 1);
 }
-#define storeLine(stat) digitalWrite(COL_ST, stat)
+
+inline void storeLine(void) {
+//	cbi(UCSR0B, TXEN0);  // Disable Transmit
+	digitalWrite(COL_ST, true);
+//	digitalWrite(COL_ST, false);
+//	digitalWrite(COL_CLK, false);
+//	digitalWrite(COL_CLK, true);
+//	sbi(UCSR0B, TXEN0);  // Enable Transmit
+}
+
+inline void storeLineOFF(void) {
+	digitalWrite(COL_ST, false);
+}
 
 #define rowshift(v) {\
   if (v)\
@@ -194,7 +205,7 @@ inline void fillLineShift(void) {
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
   LEDdisable_Clock();
-  storeLine(true);
+  storeLine();
   LEDenableShift_Clock(line != 0);
   if (!line) setDisplayTimer(frame);
 
@@ -212,7 +223,7 @@ ISR(TIMER1_OVF_vect) {
       }
     }
   }
-  storeLine(false);
+  storeLineOFF();
   fillLineShift();
 }
 

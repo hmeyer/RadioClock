@@ -5,13 +5,8 @@
 #include <stdint.h>
 #include <avr/interrupt.h>
 #include "wiring.h"
+#include "bits.h"
 
-#ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#endif
-#ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
 
 uint8_t SPIBufferCount;
 volatile uint8_t *SPIBuffer;
@@ -40,12 +35,12 @@ void SPItransferBufferReverse(volatile uint8_t *data, uint8_t count) {
   SPIBufferCount--;
 //  while( !(UCSR0A & _BV(UDRE0)) );
   UDR0 = data[SPIBufferCount];
-  sbi(UCSR0B, UDRIE0);
+  sbi(UCSR0B, UDRIE0); // Enable Data Empty Interupt
 }
 
 ISR(USART_UDRE_vect) {
   --SPIBufferCount;
   UDR0 = SPIBuffer[SPIBufferCount];
-  if (!SPIBufferCount) cbi(UCSR0B, UDRIE0);
+  if (!SPIBufferCount) cbi(UCSR0B, UDRIE0); // Disable Data Empty Interupt
 }
 
