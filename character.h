@@ -5,10 +5,8 @@
 #include <avr/pgmspace.h>
 #include "charset.h"
 
-//extern const uint8_t _charset[] PROGMEM;
-//extern const uint8_t characters[]*;
-inline const uint8_t charset(uint8_t c, uint8_t line) { return pgm_read_byte(&(characters[c][line])); }
-//inline const uint8_t charset(uint8_t c, uint8_t line) { return characters[c][line]; }
+extern const char characters[] PROGMEM;
+inline const uint8_t charset(uint8_t c, uint8_t line) { return pgm_read_byte(&(characters[(c<<3)+line])); }
 
 #define mono2HighByte(c) ((uint8_t)\
   (c&0x80) | ((c>>1)&0x20) | ((c>>2)&0x08) | ((c>>3)&0x02)\

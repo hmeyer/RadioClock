@@ -15,17 +15,18 @@ print "#ifndef CHARSET_H\n";
 print "#define CHARSET_H\n";
 print "#include <avr/io.h>\n";
 print "#include <avr/pgmspace.h>\n";
+print "const char characters[] = {\n";
 
 my @names=();
 my $char_count=32;
 while($content=~m/(^|\n)Character\(([^\)]+)/g){
+     print (($char_count==32)?' ':',');
      my $char=$2;
      my @lines=split(/\n/,$char);
 
      my $name="c_".sprintf('%03d',$char_count);
      push @names,$name;
 
-     print qq{const char $name [] PROGMEM =};
 
      my @vals=();
      for my $line (@lines){
@@ -41,12 +42,12 @@ while($content=~m/(^|\n)Character\(([^\)]+)/g){
              push @vals, '0x'.sprintf('%02x',$val);
          }
      }
-     print "{ ".join(', ',@vals)." };".$lines[0]."\n";
+     print join(', ',@vals).$lines[0]."\n";
      $char_count++;
 }
 
 
-print "const char* characters[] ={ ".join(', ',@names)." };\n";
+print "};\n";
 print "#endif\n";
 
 sub getbit{
