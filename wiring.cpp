@@ -68,7 +68,8 @@
 #define PL 12
 
 
-const uint8_t digital_pin_to_bit_mask_PGM[] PROGMEM = {
+extern const uint8_t digital_pin_to_bit_mask_PGM[] PROGMEM;
+const uint8_t digital_pin_to_bit_mask_PGM[] = {
         _BV(0), /* 0, port D */
         _BV(1),
         _BV(2),
@@ -91,7 +92,8 @@ const uint8_t digital_pin_to_bit_mask_PGM[] PROGMEM = {
         _BV(5),
 };
 
-const uint8_t digital_pin_to_port_PGM[] PROGMEM = {
+extern const uint8_t digital_pin_to_port_PGM[] PROGMEM;
+const uint8_t digital_pin_to_port_PGM[] = {
         PD, /* 0 */
         PD,
         PD,
@@ -114,7 +116,8 @@ const uint8_t digital_pin_to_port_PGM[] PROGMEM = {
         PC,
 };
 
-const uint16_t port_to_mode_PGM[] PROGMEM = {
+extern const uint16_t port_to_mode_PGM[] PROGMEM;
+const uint16_t port_to_mode_PGM[] = {
         NOT_A_PORT,
         NOT_A_PORT,
         (uint16_t) &DDRB,
@@ -122,7 +125,8 @@ const uint16_t port_to_mode_PGM[] PROGMEM = {
         (uint16_t) &DDRD,
 };
 
-const uint8_t PROGMEM digital_pin_to_timer_PGM[] PROGMEM = {
+extern const uint8_t digital_pin_to_timer_PGM[] PROGMEM;
+const uint8_t digital_pin_to_timer_PGM[] = {
         NOT_ON_TIMER, /* 0 - port D */
         NOT_ON_TIMER,
         NOT_ON_TIMER,
@@ -160,7 +164,8 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] PROGMEM = {
         NOT_ON_TIMER,
 };
 
-const uint16_t port_to_output_PGM[] PROGMEM = {
+extern const uint16_t port_to_output_PGM[] PROGMEM;
+const uint16_t port_to_output_PGM[] = {
         NOT_A_PORT,
         NOT_A_PORT,
         (uint16_t) &PORTB,
@@ -168,7 +173,8 @@ const uint16_t port_to_output_PGM[] PROGMEM = {
         (uint16_t) &PORTD,
 };
 
-const uint16_t port_to_input_PGM[] PROGMEM = {
+extern const uint16_t port_to_input_PGM[] PROGMEM;
+const uint16_t port_to_input_PGM[] = {
         NOT_A_PORT,
         NOT_A_PORT,
         (uint16_t) &PINB,

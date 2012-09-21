@@ -6,6 +6,7 @@
 #include "display.h"
 #include "wiring.h"
 #include "character.h"
+#include "cosine.h"
 #include "myspi.h"
 #include "bits.h"
 
@@ -22,8 +23,10 @@
 #define ROW_CP 14
 #define ROW_OE 17
 
-volatile uint8_t displayBuff[3 * XRES * 2];
-volatile uint8_t drawBuff[3 * XRES * 2];
+#define MAX_FRAMES 3
+
+volatile uint8_t displayBuff[MAX_FRAMES * XRES * 2];
+volatile uint8_t drawBuff[MAX_FRAMES * XRES * 2];
 volatile uint8_t *displayBuffer = displayBuff;
 volatile uint8_t *drawBuffer = drawBuff;
 volatile uint8_t switchBuffersFlag=0;
@@ -31,6 +34,8 @@ volatile uint8_t switchBuffersFlag=0;
 volatile uint8_t line = 255;
 volatile uint8_t frame = 0;
 volatile uint32_t globaluS = 0;
+volatile uint16_t globalmSuErr = 0;
+volatile uint32_t globalmS = 0;
 
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
@@ -154,6 +159,11 @@ inline void setDisplayTimer(uint8_t iteration) {
   uint32_t us = cycles;
   us /= F_CPU / (8* 2000000);
   globaluS += us;
+  globalmSuErr += us;
+  if (globalmSuErr >= 1000) {
+    globalmSuErr -= 1000;
+    globalmS++;
+  }
 }
 
 void initDisplayTimer(void) {
@@ -213,7 +223,7 @@ ISR(TIMER1_OVF_vect) {
   if (line == 8) {
     line = 0;
     frame++; 
-    if ( frame == 3 ) {
+    if ( frame == MAX_FRAMES ) {
       frame = 0;
       if (switchBuffersFlag) {
         volatile uint8_t *t = drawBuffer;
