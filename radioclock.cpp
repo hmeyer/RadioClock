@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "display.h"
+#include "scroller.h"
 #include "wiring.h"
 #include "switch.h"
 #include "WiShield/WiShield.h"
@@ -18,11 +19,9 @@ int main() {
   WiFi.initPre();
   while(WiFi.initLoop()) {
           uint8_t red[] = {3,3,3,3,3,3,3,3};
-	  mystring[0] = 's';
-	  mystring[1] = ((globaluS/1000000)%10)+'0';
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  drawString(drawBuffer, 0, mystring);
+	  scrollString(drawBuffer, "setup", globalmS/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
   }
