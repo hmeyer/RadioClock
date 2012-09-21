@@ -57,8 +57,7 @@ inline void enableINT0(int mode) {
 }
 
 
-void WiShield::init()
-{
+void WiShield::initPre() {
 	zg_init();
 
 #ifdef USE_DIG0_INTR
@@ -73,11 +72,23 @@ void WiShield::init()
 	PCMSK0 |= (1<<PCINT0);
 #endif
 
-	while(zg_get_conn_state() != 1) {
+}
+bool WiShield::initLoop() {
+	if (zg_get_conn_state() != 1) {
 		zg_drv_process();
+		return true;
 	}
-
+	return false;
+}
+void WiShield::initPost() {
 	stack_init();
+}
+
+void WiShield::init()
+{
+	initPre();
+	while(initLoop());
+	initPost();
 }
 
 void WiShield::run()

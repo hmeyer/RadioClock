@@ -44,6 +44,9 @@ extern "C" {
 
 class WiShield {
 	public:
+		void initPre();
+		bool initLoop();
+		void initPost();
 		void init();
 		void run();
 };

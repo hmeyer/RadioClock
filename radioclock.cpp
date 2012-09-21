@@ -2,6 +2,7 @@
 #include "display.h"
 #include "wiring.h"
 #include "switch.h"
+#include "WiShield/WiShield.h"
 
 
 uint16_t t = 0;
@@ -14,6 +15,18 @@ int main() {
   uint16_t stop=0;
 
   char mystring[] = "08";
+  WiFi.initPre();
+  while(WiFi.initLoop()) {
+          uint8_t red[] = {3,3,3,3,3,3,3,3};
+	  mystring[0] = 's';
+	  mystring[1] = ((globaluS/1000000)%10)+'0';
+	  while(switchBuffersFlag);
+	  clearBuffer(drawBuffer);
+	  drawString(drawBuffer, 0, mystring);
+	  colorBar(drawBuffer, red);
+	  switchBuffersFlag = 1;
+  }
+  WiFi.initPost();
   while(1) {
   	  updateSwitch();
 	  while(switchBuffersFlag);
