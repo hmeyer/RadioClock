@@ -6,6 +6,7 @@
 #include "display.h"
 #include "wiring.h"
 #include "character.h"
+#include "cosine.h"
 #include "myspi.h"
 
 #define redMask 0b01010101
@@ -64,7 +65,7 @@ void getCopperBars(uint8_t *color, uint16_t t) {
     uint8_t vg = cosine(tg & 255)>>6;
     uint8_t vr = cosine(tr & 255)>>6;
     mask |= (vg<<2) | vr;
-    color[y] = 15;mask;
+    color[y] = mask;
   }
 }
 

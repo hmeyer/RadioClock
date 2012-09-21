@@ -20,7 +20,7 @@
 
 PROGRAM		= radioclock
 #WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS		= radioclock.o character.o display.o myspi.o wiring.o wifi.o $(WISHIELD_OBJS:%=WiShield/%)
+OBJECTS		= radioclock.o display.o myspi.o wiring.o wifi.o $(WISHIELD_OBJS:%=WiShield/%)
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
@@ -72,7 +72,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) 
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h
 
 # file targets:
 %.hex: %.elf
@@ -82,6 +82,10 @@ $(PROGRAM).elf: $(OBJECTS)
 	$(COMPILE) -o $@ $(OBJECTS) $(LDFLAGS)
 
 -include $(OBJECTS:.o=.d)
+
+charset.h: charset.txt
+	./charConv.pl charset.txt > charset.h
+display.o: display.cpp charset.h
 
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@
