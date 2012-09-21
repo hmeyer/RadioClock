@@ -19,7 +19,7 @@
 # EFUSE			Target device configuration fuses (extended).
 
 PROGRAM		= radioclock
-#WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
+WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
 OBJECTS		= radioclock.o display.o myspi.o wiring.o wifi.o $(WISHIELD_OBJS:%=WiShield/%)
 DEVICE		= atmega328p
 BAUDRATE	= 115200
