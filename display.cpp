@@ -4,6 +4,7 @@
 #include <util/atomic.h>
 #include <avr/pgmspace.h>
 #include "display.h"
+#include "timing.h"
 #include "wiring.h"
 #include "character.h"
 #include "cosine.h"
@@ -36,7 +37,6 @@ volatile uint8_t frame = 0;
 volatile uint32_t globaluS = 0;
 volatile uint16_t globalmSuErr = 0;
 volatile uint32_t globalmS = 0;
-
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
 const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
@@ -236,4 +236,3 @@ ISR(TIMER1_OVF_vect) {
   storeLineOFF();
   fillLineShift();
 }
-

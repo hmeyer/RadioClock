@@ -2,14 +2,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
-
-
-#ifndef cbi
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#endif
-#ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
+#include "bits.h"
 
 #define digitalPinToPort(P) ( pgm_read_byte( digital_pin_to_port_PGM + (P) ) )
 #define digitalPinToBitMask(P) ( pgm_read_byte( digital_pin_to_bit_mask_PGM + (P) ) )

@@ -1,4 +1,3 @@
-# Name:			Makefile
 # Author:		Henning Meyer
 # Copyright:	2012 Henning Meyer
 #
@@ -19,16 +18,19 @@
 # EFUSE			Target device configuration fuses (extended).
 
 PROGRAM		= radioclock
+SERIAL_OBJS	= uart.o
 WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%)
+OBJECTS		= $(SERIAL_OBJS:%=serial/%) $(WISHIELD_OBJS:%=WiShield/%) radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o
 DEVICE		= atmega328p
 BAUDRATE	= 115200
+SERIALBAUD	= 9600
 CLOCK		= 16000000
 #PROGRAMMER	= usbtiny
 #PROGRAMMER	= avrispmkII
 PROGRAMMER	= arduino
 PORT		= /dev/ttyUSB0
 TOP := $(shell pwd)
+INC		= -I. -Iserial
 
 # Fuse configuration:
 # For a really nice guide to AVR fuses, see http://www.engbedded.com/fusecalc/
@@ -44,8 +46,10 @@ TOP := $(shell pwd)
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
 CXX = avr-g++
 CC = avr-gcc
-COMPILE = $(CXX) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize
-COMPILEC = $(CC) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
+CFLAGS += $(INC) -DSERIAL -DBAUD=$(SERIALBAUD) -DF_CPU=$(CLOCK)
+CXXFLAGS += $(INC) -DSERIAL -DBAUD=$(SERIALBAUD) -DF_CPU=$(CLOCK)
+COMPILE = $(CXX) -save-temps -Wall -g -Os -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize $(CXXFLAGS)
+COMPILEC = $(CC) -save-temps -Wall -g -Os -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize $(CFLAGS)
 
 # Linker options
 LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
@@ -72,7 +76,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h $(SERIAL_OBJS:%.o=%.ii) $(SERIAL_OBJS:%.o=%.i) $(SERIAL_OBJS:%.o=%.s)
 
 # file targets:
 %.hex: %.elf
@@ -89,7 +93,7 @@ display.o: display.cpp charset.h
 
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@
-	$(SHELL) -ec "$(CXX) -MM $(CPPFLAGS) $*.cpp > $*.d"
+	$(SHELL) -ec "$(CXX) -MM $(CXXFLAGS) $*.cpp > $*.d"
 
 %.o: %.c
 	$(COMPILEC) -c $< -o $@

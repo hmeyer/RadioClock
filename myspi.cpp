@@ -7,6 +7,7 @@
 #include "wiring.h"
 #include "bits.h"
 
+#ifndef SERIAL
 
 uint8_t SPIBufferCount;
 volatile uint8_t *SPIBuffer;
@@ -44,3 +45,8 @@ ISR(USART_UDRE_vect) {
   if (!SPIBufferCount) cbi(UCSR0B, UDRIE0); // Disable Data Empty Interupt
 }
 
+#else
+void SPIsetup(void) {}
+void SPItransfer(uint8_t data) {}
+void SPItransferBufferReverse(volatile uint8_t *data, uint8_t count) {}
+#endif
