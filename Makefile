@@ -46,10 +46,11 @@ INC		= -I. -Iserial
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
 CXX = avr-g++
 CC = avr-gcc
-CFLAGS += $(INC) -DSERIAL -DBAUD=$(SERIALBAUD) -DF_CPU=$(CLOCK)
-CXXFLAGS += $(INC) -DSERIAL -DBAUD=$(SERIALBAUD) -DF_CPU=$(CLOCK)
-COMPILE = $(CXX) -save-temps -Wall -g -Os -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize $(CXXFLAGS)
-COMPILEC = $(CC) -save-temps -Wall -g -Os -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize $(CFLAGS)
+ALLCFLAGS = $(INC) -DSERIAL -DBAUD=$(SERIALBAUD) -DF_CPU=$(CLOCK) -save-temps -Wall -g -Os -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize
+CFLAGS += $(ALLCFLAGS)
+CXXFLAGS += $(ALLCFLAGS)
+COMPILE = $(CXX) $(CXXFLAGS)
+COMPILEC = $(CC) $(CFLAGS)
 
 # Linker options
 LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
