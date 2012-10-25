@@ -7,4 +7,5 @@
 *.map
 *.elf
 *.hex
+*~
 charset.h

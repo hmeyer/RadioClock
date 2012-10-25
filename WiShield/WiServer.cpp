@@ -45,7 +45,6 @@
 #include "WiServer.h"
 
 extern "C" {
-    #include "g2100.h"
 	#include "spi.h"
 	#include "uip.h"
     #include "server.h"

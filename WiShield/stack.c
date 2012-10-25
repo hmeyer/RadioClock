@@ -42,7 +42,6 @@
 #include "network.h"
 #include "witypes.h"
 #include "config.h"
-#include "g2100.h"
 #include "spi.h"
 
 #include <string.h>
