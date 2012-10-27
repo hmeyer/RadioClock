@@ -33,9 +33,8 @@ volatile uint8_t switchBuffersFlag=0;
 
 volatile uint8_t line = 255;
 volatile uint8_t frame = 0;
-volatile uint32_t globaluS = 0;
-volatile uint16_t globalmSuErr = 0;
-volatile uint32_t globalmS = 0;
+volatile uint16_t current_us_err = 0;
+volatile uint64_t current_ms = 0;
 
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
@@ -158,11 +157,10 @@ inline void setDisplayTimer(uint8_t iteration) {
   }
   uint32_t us = cycles;
   us /= F_CPU / (8* 2000000);
-  globaluS += us;
-  globalmSuErr += us;
-  if (globalmSuErr >= 1000) {
-    globalmSuErr -= 1000;
-    globalmS++;
+  current_us_err += us;
+  if (current_us_err >= 1000) {
+    current_us_err -= 1000;
+    current_ms++;
   }
 }
 

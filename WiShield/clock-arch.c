@@ -46,5 +46,5 @@
 
 clock_time_t clock_time()
 {
-	return globalmS;
+	return getCurrent_ms();
 }
