@@ -21,7 +21,7 @@ int main() {
           uint8_t red[] = {3,3,3,3,3,3,3,3};
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  scrollString(drawBuffer, "setup", globalmS/50);
+	  scrollString(drawBuffer, "setup", getCurrent_ms()/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
   }
@@ -30,7 +30,7 @@ int main() {
   	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  if (!stop) *mystring = ((globaluS/1000000)%10)+'0';
+	  if (!stop) *mystring = ((getCurrent_ms()/1000)%10)+'0';
 	  else stop--;
 
 	  char bChar=0;

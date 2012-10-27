@@ -6,8 +6,8 @@
 #define XRES 64
 extern volatile uint8_t *drawBuffer;
 extern volatile uint8_t switchBuffersFlag;
-extern volatile uint32_t globaluS;
-extern volatile uint32_t globalmS;
+extern volatile uint64_t current_ms;
+inline uint64_t getCurrent_ms(void) { return current_ms; }
 void setupDisplay(void);
 void clearBuffer(volatile uint8_t *buffer);
 signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string);
