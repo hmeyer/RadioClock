@@ -44,8 +44,11 @@ TOP := $(shell pwd)
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
 CXX = avr-g++
 CC = avr-gcc
-COMPILE = $(CXX) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize
-COMPILEC = $(CC) -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
+ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
+CXXFLAGS = $(ALLCFLAGS)
+CFLAGS = $(ALLCFLAGS)
+COMPILE = $(CXX) $(CFLAGS)
+COMPILEC = $(CC) $(CXXFLAGS)
 
 # Linker options
 LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
@@ -72,28 +75,30 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h dep.make
 
 # file targets:
 %.hex: %.elf
 	avr-objcopy -j .text -j .data -O ihex $< $@
 	
 $(PROGRAM).elf: $(OBJECTS)
-	$(COMPILE) -o $@ $(OBJECTS) $(LDFLAGS)
+	$(COMPILE) -o $@ $^ $(LDFLAGS)
 
--include $(OBJECTS:.o=.d)
+dep.make: charset.h
+	$(CXX) $(CXXFLAGS) -MM $(OBJECTS:.o=.c*) > $@
+
+include dep.make
 
 charset.h: charset.txt
 	./charConv.pl charset.txt > charset.h
-display.o: display.cpp charset.h
+
+#display.o: display.cpp charset.h
 
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@
-	$(SHELL) -ec "$(CXX) -MM $(CPPFLAGS) $*.cpp > $*.d"
 
 %.o: %.c
 	$(COMPILEC) -c $< -o $@
-	$(SHELL) -ec "$(CC) -MM $(CFLAGS) -I. $*.c > $*.d"
 
 # Targets for code debugging and analysis:
 disasm:	$(PROGRAM).elf
