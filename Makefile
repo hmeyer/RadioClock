@@ -20,8 +20,7 @@
 
 PROGRAM		= radioclock
 WIFI_OBJS	= WiFi.o
-#WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%)
+OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WIFI_OBJS:%=wifishield/%)
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
@@ -45,7 +44,7 @@ TOP := $(shell pwd)
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
 CXX = avr-g++
 CC = avr-gcc
-ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
+ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I. -Iwifishield
 CXXFLAGS = $(ALLCFLAGS)
 CFLAGS = $(ALLCFLAGS)
 COMPILE = $(CXX) $(CFLAGS)
@@ -76,7 +75,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h dep.make
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WIFI_OBJS:%.o=%.ii) $(WIFI_OBJS:%.o=%.i) $(WIFI_OBJS:%.o=%.s) charset.h dep.make
 
 # file targets:
 %.hex: %.elf
