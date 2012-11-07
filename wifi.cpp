@@ -23,7 +23,7 @@ unsigned char wireless_mode = WIRELESS_MODE_INFRA;
 
 unsigned char ssid_len;
 unsigned char security_passphrase_len;
-char buffer[80];
+//char buffer[80];
 /*
 unsigned long int c=0;
 //---------------------------------------------------------------------------

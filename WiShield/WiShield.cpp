@@ -46,6 +46,7 @@ extern "C" {
 
 #include "WiShield.h"
 #include <avr/interrupt.h>
+#include "display.h"
 
 ISR(INT0_vect) {
 	zg_isr();
@@ -93,10 +94,23 @@ PT_THREAD(  WiFi_init(struct pt *pt) )
 	PT_END(pt);
 }
 
-void WiFi_run()
+PT_THREAD( WiFi_run(struct pt *pt) )
 {
-	stack_process();
-	zg_drv_process();
+	PT_BEGIN(pt);
+	static uint64_t ms;
+	while(1) {
+		stack_process();
+		zg_drv_process();
+		ms =  getCurrent_ms();
+		PT_WAIT_UNTIL(pt, getCurrent_ms() > (ms + 20));
+	}
+	PT_END(pt);
+}
+
+void WiFi_run_old() 
+{
+		stack_process();
+		zg_drv_process();
 }
 
 #if defined USE_DIG8_INTR && !defined APP_WISERVER

@@ -44,11 +44,9 @@ extern "C" {
 
 #include "pt.h"
 
-void WiFi_initPre();
-bool WiFi_initLoop();
-void WiFi_initPost();
 PT_THREAD( WiFi_init(struct pt *pt) );
-void WiFi_run();
+PT_THREAD( WiFi_run(struct pt *pt) );
+void WiFi_run_old();
 
 
 #endif /* WISHIELD_H_ */

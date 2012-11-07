@@ -27,12 +27,13 @@ int main() {
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
   }
-  while(1) {
+
+  PT_INIT(&p);
+  while(PT_SCHEDULE(WiFi_run(&p))) {
   	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  if (!stop)  {
-		  *mystring = ((getCurrent_ms()/1000)%10)+'0';
 		  sprintf(mystring, "%ld", getCurrent_ms());
 	  }
 	  else stop--;
