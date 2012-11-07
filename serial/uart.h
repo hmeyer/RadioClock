@@ -186,6 +186,12 @@ extern void uart1_puts_p(const char *s );
 
 /**@}*/
 
+/** read from input, return 1 if command entered */
+uint8_t uart_handle_input();
+
+/** read current command into character*/
+void uart_gets(char* input);
+
 
 #endif // UART_H 
 

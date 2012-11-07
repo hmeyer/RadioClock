@@ -216,6 +216,12 @@ LICENSE:
  #error "no UART definition for MCU available"
 #endif
 
+/*
+ *  input string
+ */
+
+static volatile char input_string[80];
+static volatile int  input_pos=0;
 
 /*
  *  module global variables
@@ -379,6 +385,9 @@ void uart_init(unsigned int baudrate)
     UART0_CONTROL = _BV(RXCIE)|(1<<RXEN)|(1<<TXEN);
 
 #endif
+
+    input_pos=0;
+    uart_puts( "\n\r$ " );
 
 }/* uart_init */
 
@@ -684,3 +693,37 @@ void uart1_puts_p(const char *progmem_s )
 
 
 #endif
+
+
+uint8_t uart_handle_input()
+{
+	uint8_t c;
+	//check if data available
+	if (uart_getc(&c) != 0) return 0;
+
+	//return at end of line
+	if ((c==10)||(c==13)){
+		uart_puts( "\n\r" );
+		input_string[input_pos]=0;
+		input_pos=0;
+//		uart_puts(input_string);
+//		uart_puts( "\n\r" );
+		return 1;
+	}
+	//read char and add to string
+	if ((c>31)&&(c<127)){
+		uart_putc( (unsigned char)c );
+		input_string[input_pos]=(unsigned char)c;
+		input_pos++;
+		if (input_pos>79) input_pos--;
+	}
+	return 0;
+}
+
+void uart_gets(char* input)
+{
+	strcpy(input,input_string);
+	input_pos=0;
+}
+
+
