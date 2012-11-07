@@ -42,15 +42,13 @@ extern "C" {
 	extern unsigned char webclient_get(char *host, unsigned int port, char *file);
 }
 
-class WiShield {
-	public:
-		void initPre();
-		bool initLoop();
-		void initPost();
-		void init();
-		void run();
-};
+#include "pt.h"
 
-extern WiShield WiFi;
+void WiFi_initPre();
+bool WiFi_initLoop();
+void WiFi_initPost();
+PT_THREAD( WiFi_init(struct pt *pt) );
+void WiFi_run();
+
 
 #endif /* WISHIELD_H_ */

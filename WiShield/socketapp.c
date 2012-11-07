@@ -47,8 +47,6 @@
 #include "uip.h"
 #include <string.h>
 
-extern char buffer[80];
-
 /*
  * Declaration of the protosocket function that handles the connection
  * (defined at the end of the code).
@@ -63,14 +61,7 @@ static int handle_connection(struct socket_app_state *s);
 void socket_app_init(void)
 {
   /* We start to listen for connections on TCP port 1000. */
-  //uip_listen(HTONS(1000));
-
-/*mic start*/
-   uip_ipaddr_t ipaddr;
-
-   uip_ipaddr(&ipaddr, 83,169,42,223);
-   uip_connect(&ipaddr, HTONS(80));
- /* mic stop */
+  uip_listen(HTONS(1000));
 }
 /*---------------------------------------------------------------------------*/
 /*
@@ -115,14 +106,10 @@ static int handle_connection(struct socket_app_state *s)
 {
   PSOCK_BEGIN(&s->p);
 
-  PSOCK_SEND_STR(&s->p, "GET /radioclock.html\n");
+  PSOCK_SEND_STR(&s->p, "Hello. What is you name?\n");
   PSOCK_READTO(&s->p, '\n');
-  if (sizeof(s->inputbuffer)>80){
-    memcpy(buffer,s->inputbuffer, sizeof(s->inputbuffer));
- }else{
-    memcpy(buffer,s->inputbuffer, 80);
-  }
-
+  PSOCK_SEND_STR(&s->p, "Hello ");
+  PSOCK_SEND_STR(&s->p, s->inputbuffer);
   memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
   PSOCK_CLOSE(&s->p);
 

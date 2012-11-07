@@ -57,7 +57,7 @@ inline void enableINT0(int mode) {
 }
 
 
-void WiShield::initPre() {
+void WiFi_initPre() {
 	zg_init();
 
 #ifdef USE_DIG0_INTR
@@ -73,25 +73,27 @@ void WiShield::initPre() {
 #endif
 
 }
-bool WiShield::initLoop() {
+bool WiFi_initLoop() {
 	if (zg_get_conn_state() != 1) {
 		zg_drv_process();
 		return true;
 	}
 	return false;
 }
-void WiShield::initPost() {
+void WiFi_initPost() {
 	stack_init();
 }
 
-void WiShield::init()
+PT_THREAD(  WiFi_init(struct pt *pt) )
 {
-	initPre();
-	while(initLoop());
-	initPost();
+	PT_BEGIN(pt);
+	WiFi_initPre();
+	PT_WAIT_WHILE(pt, WiFi_initLoop());
+	WiFi_initPost();
+	PT_END(pt);
 }
 
-void WiShield::run()
+void WiFi_run()
 {
 	stack_process();
 	zg_drv_process();
@@ -105,6 +107,4 @@ ISR(PCINT0_vect)
 }
 
 #endif
-
-WiShield WiFi;
 
