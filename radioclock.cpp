@@ -20,7 +20,9 @@ uint8_t colorbars[8];
 int8_t bcnt = 0;
 
 int main() {
-    uint8_t c;
+    char input[80]={0};
+
+//    uint8_t c;
     char buffer[7];
     int  num=134;
     uart_init( UART_BAUD_SELECT(BAUD,F_CPU) ); 
@@ -47,21 +49,28 @@ int main() {
          * UART_NO_DATA is returned when no data is available.
          *
          */
-        if (uart_getc(&c) == 0) {
+//        if (uart_getc(&c) == 0) {
 	     /*
              * new data available from UART
              * send received character back
              */
-            uart_puts_P("got char: ");
-            uart_putc( (unsigned char)c );
-            uart_puts( "\n\r" );
-        }
-        else
-        {
+//            uart_puts_P("got char: ");
+//            uart_putc( (unsigned char)c );
+//            uart_puts( "\n\r" );
+//        }
+//        else
+//        {
             /* 
              * no data available from UART 
              */
-        }
+//        }
+	//wait until command entered
+	if (uart_handle_input()==1){
+		uart_gets(input);
+		uart_puts(input);
+		uart_puts("\n\r$ ");
+	}
+
     }
 
   
