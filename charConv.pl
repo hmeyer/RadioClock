@@ -15,7 +15,7 @@ print "#ifndef CHARSET_H\n";
 print "#define CHARSET_H\n";
 print "#include <avr/io.h>\n";
 print "#include <avr/pgmspace.h>\n";
-print "const char characters[] = {\n";
+print "const unsigned char characters[] = {\n";
 
 my @names=();
 my $char_count=32;

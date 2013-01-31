@@ -38,6 +38,9 @@
 
 #include "witypes.h"
 
+#define prog_char PROGMEM char
+#define prog_uchar PROGMEM unsigned char
+
 extern U8 local_ip[];
 extern U8 gateway_ip[];
 extern U8 subnet_mask[];
@@ -48,7 +51,7 @@ extern U8 security_passphrase_len;
 extern U8 security_type;
 extern U8 wireless_mode;
 
-extern prog_uchar wep_keys[];
+extern const prog_uchar wep_keys[];
 
 extern const prog_char webpage[];
 extern const prog_char twitter[];
