@@ -35,6 +35,7 @@ volatile uint8_t line = 255;
 volatile uint8_t frame = 0;
 volatile uint16_t current_us_err = 0;
 volatile uint64_t current_ms = 0;
+volatile uint8_t current_ms_lock;
 
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
@@ -160,6 +161,7 @@ inline void setDisplayTimer(uint8_t iteration) {
   current_us_err += us;
   if (current_us_err >= 1000) {
     current_us_err -= 1000;
+    current_ms_lock++;
     current_ms++;
   }
 }

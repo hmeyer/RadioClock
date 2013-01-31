@@ -16,7 +16,7 @@ int main() {
   setupSwitch();
   uint16_t stop=0;
 
-  char mystring[10];
+  char mystring[21];
   struct pt p;
   PT_INIT(&p);
   while(PT_SCHEDULE(WiFi_init(&p))) {
@@ -34,7 +34,7 @@ int main() {
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  if (!stop)  {
-		  sprintf(mystring, "%ld", getCurrent_ms());
+		  sprintf(mystring, "%ld", (uint32_t)getCurrent_ms());
 	  }
 	  else stop--;
 
