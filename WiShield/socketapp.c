@@ -46,7 +46,7 @@
 #include "socketapp.h"
 #include "uip.h"
 #include <string.h> 
-#include "netcommand.h"
+#include "netcommandc.h"
 
 /*
  * Declaration of the protosocket function that handles the connection
