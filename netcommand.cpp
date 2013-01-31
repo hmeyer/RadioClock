@@ -9,6 +9,20 @@ void handleCommand(char *cmd) {
 }
 }
 
-void NetCommand::handleCommand(char *cmd) {
+bool NetCommand::handleCommand(char *cmd) {
+	switch (*cmd){
+		//set time
+		case 't' : 
+			return clock.setTime(cmd+1);
+		// set show end time	
+//		case 's' :
+//			return shows.add(cmd+1);
+		// twitter text
+		case '#' :
+			return true;
+	}
+
+	return false;
+	
 };
 

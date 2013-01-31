@@ -3,7 +3,7 @@
 
 class NetCommand {
 	public:
-		void handleCommand(char *cmd);
+		bool handleCommand(char *cmd);
 };
 
 extern NetCommand Commander;
