@@ -11,7 +11,8 @@ class ClockTime{
 	public:
 	ClockTime();
 
-	void setTime(uint64_t now);
+	void setTime(uint32_t now);
+	bool setTime(char *now);
 
 	uint64_t getTime();
 

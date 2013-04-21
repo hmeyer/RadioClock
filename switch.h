@@ -34,7 +34,7 @@ inline void setupSwitch() {
 }
 
 inline void updateButton(uint8_t b) {
-	uint8_t bf;
+	uint8_t bf = 0;
 	switch(b) {
 		case SW_UP: bf = SW_F_UP; break;
 		case SW_DOWN: bf = SW_F_DOWN; break;

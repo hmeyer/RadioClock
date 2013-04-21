@@ -10,3 +10,5 @@
 charset.h
 dep.make
 *~
+/.cproject
+/.project

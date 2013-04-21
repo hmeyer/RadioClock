@@ -109,8 +109,8 @@ static int handle_connection(struct socket_app_state *s)
 //  PSOCK_SEND_STR(&s->p, "Hello. What is you name?\n");
   PSOCK_READTO(&s->p, '\n');
   handleCommand(s->inputbuffer);
-//  PSOCK_SEND_STR(&s->p, "Hello ");
-//  PSOCK_SEND_STR(&s->p, s->inputbuffer);
+  PSOCK_SEND_STR(&s->p, s->inputbuffer);
+  PSOCK_SEND_STR(&s->p, "\n");
   memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
   PSOCK_CLOSE(&s->p);
   PSOCK_END(&s->p);

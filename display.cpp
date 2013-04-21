@@ -41,6 +41,7 @@ volatile uint8_t current_ms_lock;
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
 const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
 
+
 inline void LEDdisable_Clock() {
 	wdt_reset();
 	digitalWrite(ROW_OE, false);

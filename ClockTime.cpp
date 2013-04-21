@@ -14,8 +14,17 @@ ClockTime clock;
 ClockTime::ClockTime():offset(0){
 }
 
-void ClockTime::setTime(uint64_t now){
+void ClockTime::setTime(uint32_t now){
 	offset=now-getCurrent_ms();
+}
+
+bool ClockTime::setTime(char *now){
+	char *e;
+	uint32_t n = strtoul(now, &e, 10);
+	if (!e) {
+	      setTime(n);
+	      return true;
+	} else return false;
 }
 
 uint64_t ClockTime::getTime(){

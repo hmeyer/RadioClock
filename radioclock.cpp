@@ -11,6 +11,8 @@ uint16_t t = 0;
 uint8_t colorbars[8];
 int8_t bcnt = 0;
 
+volatile bool DEBUG=false;
+
 int main() {
   setupDisplay();
   setupSwitch();
@@ -30,6 +32,7 @@ int main() {
 
   PT_INIT(&p);
   while(PT_SCHEDULE(WiFi_run(&p))) {
+	  if (DEBUG) continue;
   	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
