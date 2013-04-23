@@ -5,6 +5,8 @@
 #include "switch.h"
 #include "WiShield/WiShield.h"
 #include <stdio.h>
+#include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 
 uint16_t t = 0;
@@ -16,6 +18,17 @@ volatile bool DEBUG=false;
 int main() {
   setupDisplay();
   setupSwitch();
+
+/*
+  clearBuffer(drawBuffer);
+  drawString(drawBuffer, 0, "a2");
+  uint8_t yellow[] = {15,15,15,15,15,15,15,15};
+  colorBar(drawBuffer, yellow);
+  switchBuffersFlag = 1;
+  while(1);
+*/
+
+
   uint16_t stop=0;
 
   char mystring[21];

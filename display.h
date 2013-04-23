@@ -4,6 +4,15 @@
 #include <stdint.h>
 
 #define XRES 64
+#define ROW_ST 16
+#define ROW_D 15
+#define ROW_CP 14
+#define ROW_OE 17
+
+#define COL_ST 3
+#define COL_CLK 4
+#define COL_D 1
+
 extern volatile uint8_t *drawBuffer;
 extern volatile uint8_t switchBuffersFlag;
 extern volatile uint64_t current_ms;
@@ -20,6 +29,7 @@ inline uint64_t getCurrent_ms(void) {
 	getCurrent_ms_(&ms);
 	return ms;
 }
+
 void setupDisplay(void);
 void clearBuffer(volatile uint8_t *buffer);
 signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string);

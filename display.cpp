@@ -18,10 +18,6 @@
 #define COL_ST 3
 #define COL_CLK 4
 
-#define ROW_ST 16
-#define ROW_D 15
-#define ROW_CP 14
-#define ROW_OE 17
 
 #define MAX_FRAMES 3
 
@@ -37,42 +33,31 @@ volatile uint16_t current_us_err = 0;
 volatile uint64_t current_ms = 0;
 volatile uint8_t current_ms_lock;
 
+volatile uint8_t waitClear=0;
+extern volatile bool DEBUG;
+
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
-const uint16_t DisplayTimerCycles[] = {usToCYCLES(120), usToCYCLES(200), usToCYCLES(400)};
-
+const uint16_t DisplayTimerUs[] = {120, 200, 400, 60};
+const uint16_t DisplayTimerCycles[] = {usToCYCLES(DisplayTimerUs[0]), 
+				usToCYCLES(DisplayTimerUs[1]),
+				usToCYCLES(DisplayTimerUs[2]),
+				usToCYCLES(DisplayTimerUs[3])};
 
 inline void LEDdisable_Clock() {
 	wdt_reset();
 	digitalWrite(ROW_OE, false);
-	digitalWrite(ROW_CP, 0);\
 }
-inline void LEDenableShift_Clock(bool v) {
+inline void LEDenableShift_Clock(uint8_t v) {
+	digitalWrite(ROW_CP, 0);
 	digitalWrite(ROW_D, v);
-	digitalWrite(ROW_OE, true);
 	digitalWrite(ROW_CP, 1);
+	digitalWrite(ROW_OE, true);
 }
 
 inline void storeLine(void) {
-//	cbi(UCSR0B, TXEN0);  // Disable Transmit
 	digitalWrite(COL_ST, true);
-//	digitalWrite(COL_ST, false);
-//	digitalWrite(COL_CLK, false);
-//	digitalWrite(COL_CLK, true);
-//	sbi(UCSR0B, TXEN0);  // Enable Transmit
-}
-
-inline void storeLineOFF(void) {
 	digitalWrite(COL_ST, false);
-}
-
-#define rowshift(v) {\
-  if (v)\
-    digitalWrite(ROW_D, 1);\
-  else \
-    digitalWrite(ROW_D, 0);\
-  digitalWrite(ROW_CP, 1);\
-  digitalWrite(ROW_CP, 0);\
 }
 
 void getCopperBars(uint8_t *color, uint16_t t) {
@@ -152,13 +137,12 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
 }
 
 
-inline void setDisplayTimer(uint8_t iteration) {
-  uint16_t cycles = DisplayTimerCycles[iteration];
+inline void setDisplayTimer(uint8_t frame) {
+  uint16_t cycles =  DisplayTimerCycles[frame];
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
     ICR1 = cycles;
   }
-  uint32_t us = cycles;
-  us /= F_CPU / (8* 2000000);
+  uint16_t us = DisplayTimerUs[frame];
   current_us_err += us;
   if (current_us_err >= 1000) {
     current_us_err -= 1000;
@@ -171,7 +155,7 @@ void initDisplayTimer(void) {
   TCCR1A = 0;                 // clear control register A 
   TCCR1B = _BV(WGM13);        // set mode 8: phase and frequency correct pwm, stop the timer
   
-  setDisplayTimer(2);
+  setDisplayTimer( 2 );
   TIMSK1 = _BV(TOIE1);// sets the timer overflow interrupt enable bit
 
   // Set Clock Prescaler to NO Prescaler
@@ -195,7 +179,6 @@ void setupDisplay(void) {
   SPIsetup();
   for(int i = 0; i < 8; i++) {
     SPItransfer(0);
-    rowshift(true);
   }
   initDisplayTimer();
   wdt_enable( WDTO_500MS );
@@ -215,26 +198,30 @@ inline void fillLineShift(void) {
 
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
-  LEDdisable_Clock();
-  storeLine();
-  LEDenableShift_Clock(line != 0);
-  if (!line) setDisplayTimer(frame);
+  waitClear ^= 1;
+  if (waitClear) {
+  	LEDdisable_Clock();
+  	setDisplayTimer(3);
+  } else {
+	  storeLine();
+	  LEDenableShift_Clock(line);
+	  if (!line) setDisplayTimer( frame );
 
-  line++;
-  if (line == 8) {
-    line = 0;
-    frame++; 
-    if ( frame == MAX_FRAMES ) {
-      frame = 0;
-      if (switchBuffersFlag) {
-        volatile uint8_t *t = drawBuffer;
-        drawBuffer = displayBuffer;
-        displayBuffer = t;
-        switchBuffersFlag = 0;
-      }
-    }
+	  line++;
+	  if (line == 8) {
+	    line = 0;
+	    frame++; 
+	    if ( frame == MAX_FRAMES ) {
+	      frame = 0;
+	      if (switchBuffersFlag) {
+		volatile uint8_t *t = drawBuffer;
+		drawBuffer = displayBuffer;
+		displayBuffer = t;
+		switchBuffersFlag = 0;
+	      }
+	    }
+	  }
+	  fillLineShift();
   }
-  storeLineOFF();
-  fillLineShift();
 }
 
