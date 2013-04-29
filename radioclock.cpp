@@ -19,26 +19,16 @@ int main() {
   setupDisplay();
   setupSwitch();
 
-/*
-  clearBuffer(drawBuffer);
-  drawString(drawBuffer, 0, "a2");
-  uint8_t yellow[] = {15,15,15,15,15,15,15,15};
-  colorBar(drawBuffer, yellow);
-  switchBuffersFlag = 1;
-  while(1);
-*/
-
-
   uint16_t stop=0;
 
   char mystring[21];
   struct pt p;
   PT_INIT(&p);
   while(PT_SCHEDULE(WiFi_init(&p))) {
-  	  uint8_t red[] = {3,3,3,3,3,3,3,3};
+  	  uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  scrollString(drawBuffer, "setup", getCurrent_ms()/50);
+	  scrollString(drawBuffer, "setting up wifi", getCurrent_ms()/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
   }
