@@ -97,12 +97,12 @@ PT_THREAD(  WiFi_init(struct pt *pt) )
 PT_THREAD( WiFi_run(struct pt *pt) )
 {
 	PT_BEGIN(pt);
-	static uint64_t ms;
+	static uint64_t ticks;
 	while(1) {
 		stack_process();
 		zg_drv_process();
-		ms =  getCurrent_ms();
-		PT_WAIT_UNTIL(pt, getCurrent_ms() > (ms + 20));
+		ticks =  getCurrent_ticks();
+		PT_WAIT_UNTIL(pt, getCurrent_ticks() > (ticks + 20));
 	}
 	PT_END(pt);
 }

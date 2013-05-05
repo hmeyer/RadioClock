@@ -112,7 +112,7 @@ static int handle_connection(struct socket_app_state *s)
   PSOCK_READTO(&s->p, '\n');
   res = handleCommand(s->inputbuffer);
   PSOCK_SEND_STR(&s->p, s->inputbuffer);
-  PSOCK_SEND_STR(&s->p, "\n");
+  PSOCK_SEND_STR(&s->p, "\n$ ");
   memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
   }
   PSOCK_CLOSE(&s->p);
