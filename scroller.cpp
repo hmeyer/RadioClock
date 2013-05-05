@@ -2,7 +2,7 @@
 #include "scroller.h"
 #include "display.h"
 
-#define MXRES 8
+#define MXRES 64
 
 void scrollString(volatile uint8_t *buffer, const char *string, int16_t counter) {
 	size_t l = strlen(string)*6; 
