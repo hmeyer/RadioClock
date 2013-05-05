@@ -30,8 +30,8 @@ volatile uint8_t switchBuffersFlag=0;
 volatile uint8_t line = 255;
 volatile uint8_t frame = 0;
 volatile uint16_t current_us_err = 0;
-volatile uint64_t current_ms = 0;
-volatile uint8_t current_ms_lock;
+volatile uint64_t current_ticks = 0;
+volatile uint8_t current_ticks_lock;
 
 volatile uint8_t waitClear=0;
 extern volatile bool DEBUG;
@@ -146,8 +146,8 @@ inline void setDisplayTimer(uint8_t frame) {
   current_us_err += us;
   if (current_us_err >= 1000) {
     current_us_err -= 1000;
-    current_ms_lock++;
-    current_ms++;
+    current_ticks_lock++;
+    current_ticks++;
   }
 }
 

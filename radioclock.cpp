@@ -3,6 +3,7 @@
 #include "scroller.h"
 #include "wiring.h"
 #include "switch.h"
+#include "ClockTime.h"
 #include "WiShield/WiShield.h"
 #include <stdio.h>
 #include <avr/interrupt.h>
@@ -28,7 +29,7 @@ int main() {
   	  uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
-	  scrollString(drawBuffer, "setting up wifi", getCurrent_ms()/50);
+	  scrollString(drawBuffer, "setting up wifi", getCurrent_ticks()/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
   }
@@ -40,7 +41,7 @@ int main() {
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  if (!stop)  {
-		  sprintf(mystring, "%ld", (uint32_t)getCurrent_ms());
+		  clock.print(mystring);
 	  }
 	  else stop--;
 
@@ -57,7 +58,8 @@ int main() {
 	  else if (bChar) { *mystring = bChar; stop = 200; }
 
 
-	  scrollString(drawBuffer, mystring, getCurrent_ms()/50);
+//	  scrollString(drawBuffer, mystring, getCurrent_ticks()/50);
+	  drawString(drawBuffer, 0, mystring);
 	  getCopperBars( colorbars, t/4 );
 	  colorBar(drawBuffer, colorbars);
 	  switchBuffersFlag = 1;

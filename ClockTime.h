@@ -6,17 +6,20 @@
 #include <inttypes.h>
 
 class ClockTime{
-	uint64_t offset;
+	int64_t offset;
+	double scale;
+	uint64_t oldticks;
+	uint64_t oldtime;
 
 	public:
 	ClockTime();
 
-	void setTime(uint32_t now);
-	bool setTime(char *now);
+	void setTime(uint64_t now);
+	bool setTime(char *now, char *res);
 
-	uint64_t getTime();
+	uint32_t getTime();
 
-	void print(char *dest, uint32_t duration);
+	uint8_t print(char *dest);
 };
 
 extern ClockTime clock;
