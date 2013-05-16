@@ -874,7 +874,7 @@ Character( // 119 = w
 "X X X"
 "X X X"
 "X X X"
-" X X "
+"X X X"
 " X X "
 " X X "
 ),

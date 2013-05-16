@@ -1,6 +1,6 @@
 #include "switch.h"
 
-uint8_t switchState;
-uint8_t switchPressedState;
+volatile uint8_t buttonBuffer;
+volatile uint8_t _buttonPressed;
 
 

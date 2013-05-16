@@ -44,7 +44,10 @@ bool ClockTime::setTime(char *now, char *res){
 	uint64_t n = strtou64(now, &e);
 	sprintf(res, "set:");
 	setTime(n);
-	printinternal(res+4, n/1000);
+	res += 4;
+	uint8_t t = printinternal(res, n/1000);
+	res += t;
+	sprintf(res, " s_e5=%li", (long int)(scale * 10000L) );
 	return true;
 }
 

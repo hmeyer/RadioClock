@@ -9,6 +9,7 @@
 #include "cosine.h"
 #include "myspi.h"
 #include "bits.h"
+#include "switch.h"
 
 #define redMask 0b01010101
 #define greenMask (redMask<<1)
@@ -28,6 +29,7 @@ volatile uint8_t *drawBuffer = drawBuff;
 volatile uint8_t switchBuffersFlag=0;
 
 volatile uint8_t line = 255;
+volatile uint8_t lineBit = 0;
 volatile uint8_t frame = 0;
 volatile uint16_t current_us_err = 0;
 volatile uint64_t current_ticks = 0;
@@ -38,11 +40,17 @@ extern volatile bool DEBUG;
 
 
 #define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
-const uint16_t DisplayTimerUs[] = {120, 200, 400, 60};
-const uint16_t DisplayTimerCycles[] = {usToCYCLES(DisplayTimerUs[0]), 
-				usToCYCLES(DisplayTimerUs[1]),
-				usToCYCLES(DisplayTimerUs[2]),
-				usToCYCLES(DisplayTimerUs[3])};
+const uint16_t DisplayTimerUs_[] = {120, 200, 400, 60};
+const uint16_t DisplayTimerCycles[] = {usToCYCLES(DisplayTimerUs_[0]), 
+				usToCYCLES(DisplayTimerUs_[1]),
+				usToCYCLES(DisplayTimerUs_[2]),
+				usToCYCLES(DisplayTimerUs_[3])};
+#define cyclesToUs(cycles) ((uint16_t)(cycles / (F_CPU / 2000000)))
+const uint16_t DisplayTimerUs[] = {cyclesToUs(DisplayTimerCycles[0]),
+		cyclesToUs(DisplayTimerCycles[1]),
+		cyclesToUs(DisplayTimerCycles[2]),
+		cyclesToUs(DisplayTimerCycles[3])};
+
 
 inline void LEDdisable_Clock() {
 	wdt_reset();
@@ -205,11 +213,14 @@ ISR(TIMER1_OVF_vect) {
   } else {
 	  storeLine();
 	  LEDenableShift_Clock(line);
+	  updateButton(lineBit);
 	  if (!line) setDisplayTimer( frame );
 
 	  line++;
+	  lineBit<<=1;
 	  if (line == 8) {
 	    line = 0;
+	    lineBit = 1;
 	    frame++; 
 	    if ( frame == MAX_FRAMES ) {
 	      frame = 0;

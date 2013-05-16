@@ -25,26 +25,39 @@ int main() {
   char mystring[21];
   struct pt p;
   PT_INIT(&p);
+  uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
+  extern volatile uint8_t *displayBuffer;
+  long int num = 0;
   while(PT_SCHEDULE(WiFi_init(&p))) {
-  	  uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
 	  while(switchBuffersFlag);
+	  if (buttonPressed(SW_RIGHT)) num++;
+	  if (buttonPressed(SW_LEFT)) num--;
+	  if (buttonPressed(SW_UP)) num*=2;
+	  if (buttonPressed(SW_DOWN)) num/=2;
+	  if (buttonPressed(SW_PUSH)) num=0;
+	  clearBuffer(drawBuffer);
+	  sprintf(mystring, "num:%ld", num);
+	  drawString(drawBuffer, 0, mystring);
+	  colorBar(drawBuffer, red);
+	  switchBuffersFlag = 1;
+/*	  
 	  clearBuffer(drawBuffer);
 	  scrollString(drawBuffer, "setting up wifi", getCurrent_ticks()/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
+*/
   }
 
   PT_INIT(&p);
   while(PT_SCHEDULE(WiFi_run(&p))) {
 	  if (DEBUG) continue;
-  	  updateSwitch();
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  if (!stop)  {
 		  clock.print(mystring);
 	  }
 	  else stop--;
-
+/*
 	  char bChar=0;
 
 	  if (switchPressed(SW_F_UP)) bChar = 'U';
@@ -56,7 +69,7 @@ int main() {
 	  else if (bChar =='R') { *mystring=(++bcnt)+'0'; stop = 200; }
 	  else if (bChar =='P') { *mystring=(bcnt)+'0'; stop = 200; }
 	  else if (bChar) { *mystring = bChar; stop = 200; }
-
+*/
 
 //	  scrollString(drawBuffer, mystring, getCurrent_ticks()/50);
 	  drawString(drawBuffer, 0, mystring);
