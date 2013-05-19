@@ -40,7 +40,7 @@ inline void updateButton(uint8_t flag) {
 
 inline bool buttonPressed(uint8_t b) {
 	if (_buttonPressed & _BV(b)) {
-		_buttonPressed ^= _BV(b);
+		_buttonPressed &= ~_BV(b);
 		return true;
 	}
 	return false;
