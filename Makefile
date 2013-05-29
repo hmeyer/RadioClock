@@ -20,7 +20,9 @@
 
 PROGRAM		= radioclock
 WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS		= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o ClockTime.o
+OBJECTS_C	= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o ClockTime.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o
+OBJECTS_ASM	= #i2cmaster/i2cmaster.o
+OBJECTS		= $(OBJECTS_C) $(OBJECTS_ASM)
 DEVICE		= atmega328p
 BAUDRATE	= 115200
 CLOCK		= 16000000
@@ -42,13 +44,16 @@ TOP := $(shell pwd)
 # Tune the lines below only if you know what you are doing:
 
 AVRDUDE = avrdude -c $(PROGRAMMER) -P $(PORT) -p $(DEVICE) -b $(BAUDRATE) -D
+ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs
+ALL_ASFLAGS = -mmcu=$(DEVICE) -I. -x assembler-with-cpp $(ASFLAGS)
+
 CXX = avr-g++
 CC = avr-gcc
-ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I.
+ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I. -funsigned-char -funsigned-bitfields -fpack-struct
 CXXFLAGS = $(ALLCFLAGS)
-CFLAGS = $(ALLCFLAGS)
-COMPILE = $(CXX) $(CFLAGS)
-COMPILEC = $(CC) $(CXXFLAGS)
+CFLAGS = $(ALLCFLAGS) -std=c99
+COMPILE = $(CXX) $(CXXFLAGS)
+COMPILEC = $(CC) $(CFLAGS)
 
 # Linker options
 LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
@@ -75,7 +80,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h dep.make
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(OBJECTS:.o=.lst) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h dep.make
 
 # file targets:
 %.hex: %.elf
@@ -85,7 +90,7 @@ $(PROGRAM).elf: $(OBJECTS)
 	$(COMPILE) -o $@ $^ $(LDFLAGS)
 
 dep.make: charset.h
-	$(CXX) $(CXXFLAGS) -MM $(OBJECTS:.o=.c*) > $@
+	$(CXX) $(CXXFLAGS) -MM $(OBJECTS_C:.o=.c*) > $@
 
 include dep.make
 
@@ -93,6 +98,10 @@ charset.h: charset.txt
 	./charConv.pl charset.txt > charset.h
 
 #display.o: display.cpp charset.h
+%.o: %.S
+	@echo
+	@echo $(MSG_ASSEMBLING) $<
+	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 %.o: %.cpp
 	$(COMPILE) -c $< -o $@
