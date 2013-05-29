@@ -8,17 +8,20 @@
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include "rtc/RTClib.h"
 
 
 uint16_t t = 0;
 uint8_t colorbars[8];
 int8_t bcnt = 0;
+RTC_DS1307 RTC;
 
 volatile bool DEBUG=false;
 
 int main() {
   setupDisplay();
   setupSwitch();
+  RTC.begin();
 
   uint16_t stop=0;
 
@@ -26,8 +29,8 @@ int main() {
   struct pt p;
   PT_INIT(&p);
   uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
-  extern volatile uint8_t *displayBuffer;
   long int num = 0;
+  DateTime d;
   while(PT_SCHEDULE(WiFi_init(&p))) {
 	  while(switchBuffersFlag);
 	  if (buttonPressed(SW_RIGHT)) num++;
@@ -36,7 +39,9 @@ int main() {
 	  if (buttonPressed(SW_DOWN)) num/=2;
 	  if (buttonPressed(SW_PUSH)) num=0;
 	  clearBuffer(drawBuffer);
-	  sprintf(mystring, "num:%ld", num);
+//	  d = RTC.now();
+//	  sprintf(mystring, "%ld %02d:%02d:%02d", num, d.hour(), d.minute(), d.second());
+	  sprintf(mystring, "%ld %d", num, RTC.isrunning() );
 	  drawString(drawBuffer, 0, mystring);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
