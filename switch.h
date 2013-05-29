@@ -5,7 +5,7 @@
 #include <avr/io.h>
 #include "wiring.h"
 
-#define SW_PIN 18
+#define SW_PIN 5
 
 #define SW_UP 1
 #define SW_DOWN 4
@@ -24,7 +24,7 @@ inline void setupSwitch() {
 }
 
 inline uint8_t swPin(void) {
-	return PINC & _BV(4);
+	return PIND & _BV(5);
 }
 
 inline void updateButton(uint8_t flag) {
