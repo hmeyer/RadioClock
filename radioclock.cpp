@@ -39,9 +39,9 @@ int main() {
 	  if (buttonPressed(SW_DOWN)) num/=2;
 	  if (buttonPressed(SW_PUSH)) num=0;
 	  clearBuffer(drawBuffer);
-//	  d = RTC.now();
-//	  sprintf(mystring, "%ld %02d:%02d:%02d", num, d.hour(), d.minute(), d.second());
-	  sprintf(mystring, "%ld %d", num, RTC.isrunning() );
+	  d = RTC.now();
+	  sprintf(mystring, "%ld %02d:%02d:%02d", num, d.hour(), d.minute(), d.second());
+// 	  sprintf(mystring, "%ld %d", num, RTC.isrunning() );
 	  drawString(drawBuffer, 0, mystring);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;

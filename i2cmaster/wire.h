@@ -24,13 +24,21 @@ inline uint8_t endTransmission(bool send_stop=true) {
 inline void write(uint8_t data) {
 	i2c_write( data );
 }
-uint8_t requestFrom(uint8_t address, uint8_t num, bool send_stop=true) {
+inline void requestFrom(uint8_t address, uint8_t num, bool send_stop=true) {
 	i2c_start_wait( (address << 1) | I2C_READ );
-	return 0;
+	r = num;
+	s_stop = send_stop;
 }
 inline uint8_t read() {
-	return i2c_readAck();
+	if (!--r) {
+		return i2c_readNak();
+	} else
+		return i2c_readAck();
+	if (s_stop) i2c_stop();
 }
+private:
+	uint8_t r;
+	bool s_stop;
 };
 
 extern WIRE Wire;
