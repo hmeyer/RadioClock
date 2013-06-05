@@ -48,6 +48,10 @@ extern "C" {
 #include <avr/interrupt.h>
 #include "display.h"
 
+template <class T> const T& min (const T& a, const T& b) {
+	  return !(b<a)?a:b;     // or: return !comp(b,a)?a:b; for version (2)
+}
+
 ISR(INT0_vect) {
 	zg_isr();
 }
@@ -97,12 +101,12 @@ PT_THREAD(  WiFi_init(struct pt *pt) )
 PT_THREAD( WiFi_run(struct pt *pt) )
 {
 	PT_BEGIN(pt);
-	static uint64_t ticks;
+	static uint32_t ms;
 	while(1) {
 		stack_process();
 		zg_drv_process();
-		ticks =  getCurrent_ticks();
-		PT_WAIT_UNTIL(pt, getCurrent_ticks() > (ticks + 20));
+		ms =  min(getCurrent_ms(), uint32_t(0xffff-20)); 
+		PT_WAIT_UNTIL(pt, getCurrent_ms() > (ms + 20));
 	}
 	PT_END(pt);
 }

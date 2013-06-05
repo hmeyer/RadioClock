@@ -32,25 +32,14 @@ volatile uint8_t line = 255;
 volatile uint8_t lineBit = 0;
 volatile uint8_t frame = 0;
 volatile uint16_t current_us_err = 0;
-volatile uint64_t current_ticks = 0;
+volatile uint32_t current_ticks = 0;
 volatile uint8_t current_ticks_lock;
 
-volatile uint8_t waitClear=0;
+volatile bool waitClear=true;
 extern volatile bool DEBUG;
 
 
-#define usToCYCLES(microseconds) ((F_CPU / 2000000) * microseconds)
-const uint16_t DisplayTimerUs_[] = {120, 200, 400, 60};
-const uint16_t DisplayTimerCycles[] = {usToCYCLES(DisplayTimerUs_[0]), 
-				usToCYCLES(DisplayTimerUs_[1]),
-				usToCYCLES(DisplayTimerUs_[2]),
-				usToCYCLES(DisplayTimerUs_[3])};
-#define cyclesToUs(cycles) ((uint16_t)(cycles / (F_CPU / 2000000)))
-const uint16_t DisplayTimerUs[] = {cyclesToUs(DisplayTimerCycles[0]),
-		cyclesToUs(DisplayTimerCycles[1]),
-		cyclesToUs(DisplayTimerCycles[2]),
-		cyclesToUs(DisplayTimerCycles[3])};
-
+const uint16_t DisplayTimerCycles[] = { 100, 20000, 65535, 400};
 
 inline void LEDdisable_Clock() {
 	wdt_reset();
@@ -150,10 +139,7 @@ inline void setDisplayTimer(uint8_t frame) {
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
     ICR1 = cycles;
   }
-  uint16_t us = DisplayTimerUs[frame];
-  current_us_err += us;
-  if (current_us_err >= 1000) {
-    current_us_err -= 1000;
+  if (!frame) ATOMIC_BLOCK(ATOMIC_FORCEON) {
     current_ticks_lock++;
     current_ticks++;
   }
@@ -206,16 +192,15 @@ inline void fillLineShift(void) {
 
 //void displayCallback() {
 ISR(TIMER1_OVF_vect) {
-  waitClear ^= 1;
-  if (waitClear) {
+  if (!waitClear) {
   	LEDdisable_Clock();
   	setDisplayTimer(3);
-  } else {
+  	waitClear = true;
+  } else if (SPIfinished()) {
 	  storeLine();
 	  LEDenableShift_Clock(line);
 	  updateButton(lineBit);
 	  if (!line) setDisplayTimer( frame );
-
 	  line++;
 	  lineBit<<=1;
 	  if (line == 8) {
@@ -232,6 +217,7 @@ ISR(TIMER1_OVF_vect) {
 	      }
 	    }
 	  }
+  	  waitClear = false;
 	  fillLineShift();
   }
 }

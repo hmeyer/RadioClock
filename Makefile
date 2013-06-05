@@ -20,7 +20,7 @@
 
 PROGRAM		= radioclock
 WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS_C	= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o ClockTime.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o
+OBJECTS_C	= radioclock.o display.o myspi.o wiring.o switch.o wifi.o scroller.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o
 OBJECTS_ASM	= #i2cmaster/i2cmaster.o
 OBJECTS		= $(OBJECTS_C) $(OBJECTS_ASM)
 DEVICE		= atmega328p

@@ -8,7 +8,7 @@
 #include "bits.h"
 
 
-uint8_t SPIBufferCount;
+volatile uint8_t SPIBufferCount;
 volatile uint8_t *SPIBuffer;
 
 void SPIsetup(void) {

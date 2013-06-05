@@ -3,7 +3,6 @@
 #include "scroller.h"
 #include "wiring.h"
 #include "switch.h"
-#include "ClockTime.h"
 #include "WiShield/WiShield.h"
 #include <stdio.h>
 #include <avr/interrupt.h>
@@ -31,6 +30,10 @@ int main() {
   uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
   long int num = 0;
   DateTime d;
+  d = RTC.now();
+  uint32_t ssec = d.unixtime();
+  uint32_t sticks;
+  _getCurrent_ticks(&sticks);
   while(PT_SCHEDULE(WiFi_init(&p))) {
 	  while(switchBuffersFlag);
 	  if (buttonPressed(SW_RIGHT)) num++;
@@ -40,7 +43,9 @@ int main() {
 	  if (buttonPressed(SW_PUSH)) num=0;
 	  clearBuffer(drawBuffer);
 	  d = RTC.now();
-	  sprintf(mystring, "%ld %02d:%02d:%02d", num, d.hour(), d.minute(), d.second());
+	  uint32_t ticks; _getCurrent_ticks(&ticks);
+	  uint32_t ticks_per_second = (ticks - sticks) / (d.unixtime() - ssec);
+	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, ticks_per_second, d.hour(), d.minute(), d.second());
 // 	  sprintf(mystring, "%ld %d", num, RTC.isrunning() );
 	  drawString(drawBuffer, 0, mystring);
 	  colorBar(drawBuffer, red);
@@ -59,7 +64,6 @@ int main() {
 	  while(switchBuffersFlag);
 	  clearBuffer(drawBuffer);
 	  if (!stop)  {
-		  clock.print(mystring);
 	  }
 	  else stop--;
 /*

@@ -15,19 +15,18 @@
 
 extern volatile uint8_t *drawBuffer;
 extern volatile uint8_t switchBuffersFlag;
-extern volatile uint64_t current_ticks;
-extern volatile uint8_t current_ticks_lock;
-inline void getCurrent_ticks_(uint64_t *ticks) {
+inline void _getCurrent_ticks(uint32_t *ticks) {
+	extern volatile uint32_t current_ticks;
+	extern volatile uint8_t current_ticks_lock;
 	uint8_t l;
 	do {
 		l = current_ticks_lock;
 		*ticks = current_ticks;
 	} while (l!=current_ticks_lock);
 }
-inline uint64_t getCurrent_ticks(void) {
-	uint64_t ticks;
-	getCurrent_ticks_(&ticks);
-	return ticks;
+inline uint32_t getCurrent_ms(void) {
+	uint32_t t; _getCurrent_ticks(&t);
+	return t<<2;
 }
 
 void setupDisplay(void);
