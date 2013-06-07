@@ -40,17 +40,36 @@ int main() {
 	  clearBuffer(drawBuffer);
 	  d = RTC.now();
 	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, getCurrent_ms()/1000, d.hour(), d.minute(), d.second());
-// 	  sprintf(mystring, "%ld %d", num, RTC.isrunning() );
-//	  drawString(drawBuffer, 0, mystring);
-	  scrollString(drawBuffer, mystring, getCurrent_ms()/40);
+	  drawString(drawBuffer, 8, mystring);
+//	  scrollString(drawBuffer, mystring, getCurrent_ms()/40);
 	  colorBar(drawBuffer, red);
-	  switchBuffersFlag = 1;
 /*	  
 	  clearBuffer(drawBuffer);
 	  scrollString(drawBuffer, "setting up wifi", getCurrent_ticks()/50);
 	  colorBar(drawBuffer, red);
 	  switchBuffersFlag = 1;
 */
+
+
+	  drawBuffer[0]=0;
+	  drawBuffer[14*XRES/8]=0;
+	  drawBuffer[3*XRES/8]=0b01111111;
+	  drawBuffer[12*XRES/8]=0b11111110;
+	  for(uint8_t i=5; i<16; i+=2) {
+	  	drawBuffer[i*XRES/8]=0b01000000;
+	  	drawBuffer[(i-5)*XRES/8]=0b00000010;
+	  }
+
+	  drawBuffer[(16+5)*XRES/8]=0b00111111;
+	  drawBuffer[(16+10)*XRES/8]=0b11111100;
+	  for(uint8_t i=7; i<16; i+=2) {
+	  	drawBuffer[(16+i)*XRES/8]=0b00100000;
+	  	drawBuffer[(32+i)*XRES/8]=0b00011111;
+	  	drawBuffer[(16+i-7)*XRES/8]=0b00000100;
+	  	drawBuffer[(32+i-7)*XRES/8]=0b11111000;
+	  }
+		
+	  switchBuffersFlag = 1;
   }
 
   PT_INIT(&p);
