@@ -26,7 +26,7 @@ inline void _getCurrent_ticks(uint32_t *ticks) {
 }
 inline uint32_t getCurrent_ms(void) {
 	uint32_t t; _getCurrent_ticks(&t);
-	return t<<2;
+	return t;
 }
 
 void setupDisplay(void);

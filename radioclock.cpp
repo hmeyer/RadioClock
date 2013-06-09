@@ -29,7 +29,8 @@ int main() {
   PT_INIT(&p);
   uint8_t red[] = {1,2,3,2+4,1+8,12,8,4};
   long int num = 0;
-  DateTime d;
+  DateTime d = RTC.now();
+  uint32_t b = d.unixtime();
   while(PT_SCHEDULE(WiFi_init(&p))) {
 	  while(switchBuffersFlag);
 	  if (buttonPressed(SW_RIGHT)) num++;
@@ -39,7 +40,7 @@ int main() {
 	  if (buttonPressed(SW_PUSH)) num=0;
 	  clearBuffer(drawBuffer);
 	  d = RTC.now();
-	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, getCurrent_ms()/1000, d.hour(), d.minute(), d.second());
+	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, getCurrent_ms()/(d.unixtime()-b), d.hour(), d.minute(), d.second());
 	  drawString(drawBuffer, 8, mystring);
 //	  scrollString(drawBuffer, mystring, getCurrent_ms()/40);
 	  colorBar(drawBuffer, red);

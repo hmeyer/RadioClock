@@ -39,7 +39,7 @@ volatile bool waitClear=true;
 extern volatile bool DEBUG;
 
 
-const uint16_t DisplayTimerCycles[] = { 100, 20000, 65535, 400};
+const uint16_t DisplayTimerCycles[] = { 800, 2000, 8000};
 
 inline void LEDdisable_Clock() {
 	wdt_reset();
@@ -71,16 +71,16 @@ void getCopperBars(uint8_t *color, uint16_t t) {
 }
 
 void colorBar(volatile uint8_t *buffer, const uint8_t *color) { // higher bits = background, lower bits = foreground
-  for(int8_t i=2; i>=0; i--) {
+  for(int8_t i=3; i>=1; i--) {
     volatile uint8_t *lookupbuffer = buffer;
-    volatile uint8_t *fillbuffer = &(buffer[XRES*2*i]);
+    volatile uint8_t *fillbuffer = &(buffer[XRES*2*(i-1)]);
     for(uint8_t y=0; y < 8; y++) {
       uint8_t col = color[y];
       uint8_t fgred = 0, fggreen =  0, bgred = 0, bggreen = 0;
-      if (( col       & 3)       > i) fgred = 0xff;
-      if (((col >> 2) & 3) > i) fggreen = 0xff;
-      if (((col >> 4) & 3) > i) bgred = 0xff;
-      if ( (col >> 6)      > i) bggreen = 0xff;
+      if (( col       & 3)      == i) fgred = 0xff;
+      if (((col >> 2) & 3) == i) fggreen = 0xff;
+      if (((col >> 4) & 3) == i) bgred = 0xff;
+      if ( (col >> 6)      == i) bggreen = 0xff;
       uint8_t x2 = XRES/8;
       for(uint8_t x=0; x < XRES/8; x++) {
         uint8_t val = lookupbuffer[x];
@@ -134,23 +134,22 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
 }
 
 
-inline void setDisplayTimer(uint8_t frame) {
-  uint16_t cycles =  DisplayTimerCycles[frame];
+inline void setDisplayTimer(uint16_t cycles) {
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
-    ICR1 = cycles;
+    OCR1A = cycles;
   }
   if (!frame) ATOMIC_BLOCK(ATOMIC_FORCEON) {
     current_ticks_lock++;
-    current_ticks++;
+    current_ticks+=12;
   }
 }
 
 void initDisplayTimer(void) {
-  TCCR1A = 0;                 // clear control register A 
-  TCCR1B = _BV(WGM13);        // set mode 8: phase and frequency correct pwm, stop the timer
+  TCCR1A = 0;
+  TCCR1B = _BV(WGM12);        // set CTC
   
-  setDisplayTimer( 2 );
-  TIMSK1 = _BV(TOIE1);// sets the timer overflow interrupt enable bit
+  setDisplayTimer( DisplayTimerCycles[2] );
+  TIMSK1 = _BV(OCIE1A);// sets the timer 1 output compare interrupt enable bit
 
   // Set Clock Prescaler to NO Prescaler
   uint8_t clockSelectBits = _BV(CS10);
@@ -175,7 +174,7 @@ void setupDisplay(void) {
     SPItransfer(0);
   }
   initDisplayTimer();
-  wdt_enable( WDTO_500MS );
+  wdt_enable( WDTO_15MS );
 }
 
 
@@ -191,16 +190,15 @@ inline void fillLineShift(void) {
 
 
 //void displayCallback() {
-ISR(TIMER1_OVF_vect) {
+ISR(TIMER1_COMPA_vect) {
   if (!waitClear) {
   	LEDdisable_Clock();
-  	setDisplayTimer(3);
   	waitClear = true;
   } else if (SPIfinished()) {
 	  storeLine();
 	  LEDenableShift_Clock(line);
 	  updateButton(lineBit);
-	  if (!line) setDisplayTimer( frame );
+	  if (!line) setDisplayTimer( DisplayTimerCycles[frame] );
 	  line++;
 	  lineBit<<=1;
 	  if (line == 8) {
