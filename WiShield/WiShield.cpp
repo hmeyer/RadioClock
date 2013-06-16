@@ -46,7 +46,9 @@ extern "C" {
 
 #include "WiShield.h"
 #include <avr/interrupt.h>
-#include "display.h"
+#include "display_timer.h"
+
+wifi WiFi;
 
 template <class T> const T& min (const T& a, const T& b) {
 	  return !(b<a)?a:b;     // or: return !comp(b,a)?a:b; for version (2)
@@ -62,7 +64,7 @@ inline void enableINT0(int mode) {
 }
 
 
-void WiFi_initPre() {
+inline void WiFi_initPre() {
 	zg_init();
 
 #ifdef USE_DIG0_INTR
@@ -78,28 +80,25 @@ void WiFi_initPre() {
 #endif
 
 }
-bool WiFi_initLoop() {
+inline bool WiFi_initLoop() {
 	if (zg_get_conn_state() != 1) {
 		zg_drv_process();
 		return true;
 	}
 	return false;
 }
-void WiFi_initPost() {
+inline void WiFi_initPost() {
 	stack_init();
 }
 
-PT_THREAD(  WiFi_init(struct pt *pt) )
+PT_THREAD( wifi::run(struct pt *pt) )
 {
 	PT_BEGIN(pt);
 	WiFi_initPre();
 	PT_WAIT_WHILE(pt, WiFi_initLoop());
 	WiFi_initPost();
 	PT_END(pt);
-}
-
-PT_THREAD( WiFi_run(struct pt *pt) )
-{
+	m_connected = true;
 	PT_BEGIN(pt);
 	static uint32_t ms;
 	while(1) {
@@ -111,18 +110,13 @@ PT_THREAD( WiFi_run(struct pt *pt) )
 	PT_END(pt);
 }
 
-void WiFi_run_old() 
-{
-		stack_process();
-		zg_drv_process();
-}
-
 #if defined USE_DIG8_INTR && !defined APP_WISERVER
 // PCINT0 interrupt vector
 ISR(PCINT0_vect)
 {
 	zg_isr();
 }
+
 
 #endif
 

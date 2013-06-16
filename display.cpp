@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <util/atomic.h>
 #include <avr/pgmspace.h>
+#include <string.h>
 #include "display.h"
 #include "wiring.h"
 #include "character.h"
@@ -26,7 +27,7 @@ volatile uint8_t displayBuff[MAX_FRAMES * XRES * 2];
 volatile uint8_t drawBuff[MAX_FRAMES * XRES * 2];
 volatile uint8_t *displayBuffer = displayBuff;
 volatile uint8_t *drawBuffer = drawBuff;
-volatile uint8_t switchBuffersFlag=0;
+volatile bool switchBuffersFlag=false;
 
 volatile uint8_t line = 255;
 volatile uint8_t lineBit = 0;
@@ -57,7 +58,7 @@ inline void storeLine(void) {
 	digitalWrite(COL_ST, false);
 }
 
-void getCopperBars(uint8_t *color, uint16_t t) {
+void LEDDisplay::getCopperBars(uint8_t *color, uint16_t t) {
   for(int y=0;y<8;y++) {
     uint8_t mask = 0;
     uint16_t tg = (-t+y*3)*13;
@@ -70,10 +71,10 @@ void getCopperBars(uint8_t *color, uint16_t t) {
   }
 }
 
-void colorBar(volatile uint8_t *buffer, const uint8_t *color) { // higher bits = background, lower bits = foreground
+void LEDDisplay::colorBar(const uint8_t *color) { // higher bits = background, lower bits = foreground
   for(int8_t i=3; i>=1; i--) {
-    volatile uint8_t *lookupbuffer = buffer;
-    volatile uint8_t *fillbuffer = &(buffer[XRES*2*(i-1)]);
+    volatile uint8_t *lookupbuffer = drawBuffer;
+    volatile uint8_t *fillbuffer = &(drawBuffer[XRES*2*(i-1)]);
     for(uint8_t y=0; y < 8; y++) {
       uint8_t col = color[y];
       uint8_t fgred = 0, fggreen =  0, bgred = 0, bggreen = 0;
@@ -95,12 +96,12 @@ void colorBar(volatile uint8_t *buffer, const uint8_t *color) { // higher bits =
 }
 
 
-void clearBuffer(volatile uint8_t *buffer) {
+void LEDDisplay::clearBuffer() {
   for(uint8_t i=0;i < XRES * 2;i++)
-    buffer[i]=0;
+    drawBuffer[i]=0;
 }
 
-void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
+void LEDDisplay::drawChar(signed char &pos, uint8_t charIdx) {
   const signed char width = 5;
   if ((pos > -width) && (pos < XRES)) {
     signed char bufferIndex = pos >> 3;
@@ -109,9 +110,9 @@ void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
     bool lowerLimit = (bufferIndex >= 0);
     for(uint8_t y=0;y<8;y++) {
       uint8_t charByte = charset(charIdx, y);
-      if (lowerLimit) buffer[ bufferIndex ] |= charByte >> bitOffset;
+      if (lowerLimit) drawBuffer[ bufferIndex ] |= charByte >> bitOffset;
       if (bitOffset && upperLimit) {
-        buffer[ bufferIndex + 1 ] |= charByte << (8-bitOffset);
+        drawBuffer[ bufferIndex + 1 ] |= charByte << (8-bitOffset);
       }
       bufferIndex += 2 * (XRES/8);
     }
@@ -119,7 +120,7 @@ void drawChar(volatile uint8_t *buffer, signed char &pos, uint8_t charIdx) {
   pos += width+1;
 }
 
-signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string) {
+signed char LEDDisplay::drawString(signed char pos, const char *string) {
   while(*string!=0 && pos < XRES) {
     uint8_t charIdx = 10;
     char c = *string;
@@ -127,10 +128,22 @@ signed char drawString(volatile uint8_t *buffer, signed char pos, const char *st
       charIdx = c - 32;
     else charIdx = 127 - 32;
       
-    drawChar( buffer, pos, charIdx);
+    drawChar( pos, charIdx);
     string++;
   }
   return pos;
+}
+
+void LEDDisplay::scrollString(const char *string, int16_t counter) {
+	size_t l = strlen(string)*6; 
+	int16_t scrollrange = l + XRES;
+	if (scrollrange<1) {
+		drawString(0, string);
+		return;
+	}
+	int16_t scrollpos = counter % scrollrange;
+	scrollpos = XRES - scrollpos;
+	drawString(scrollpos, string);
 }
 
 
@@ -140,7 +153,7 @@ inline void setDisplayTimer(uint16_t cycles) {
   }
   if (!frame) ATOMIC_BLOCK(ATOMIC_FORCEON) {
     current_ticks_lock++;
-    current_ticks+=12;
+    current_ticks+=11;
   }
 }
 
@@ -158,7 +171,7 @@ void initDisplayTimer(void) {
 }
 
 
-void setupDisplay(void) {
+void LEDDisplay::begin(void) {
   pinMode(ROW_OE, OUTPUT);
   LEDenableShift_Clock(true);
   LEDdisable_Clock();
@@ -176,6 +189,7 @@ void setupDisplay(void) {
   initDisplayTimer();
   wdt_enable( WDTO_15MS );
 }
+
 
 
 
@@ -211,7 +225,7 @@ ISR(TIMER1_COMPA_vect) {
 		volatile uint8_t *t = drawBuffer;
 		drawBuffer = displayBuffer;
 		displayBuffer = t;
-		switchBuffersFlag = 0;
+		switchBuffersFlag = false;
 	      }
 	    }
 	  }
@@ -219,4 +233,6 @@ ISR(TIMER1_COMPA_vect) {
 	  fillLineShift();
   }
 }
+
+LEDDisplay DISP;
 

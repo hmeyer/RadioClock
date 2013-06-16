@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "display.h"
-#include "scroller.h"
+#include "display_timer.h"
 #include "wiring.h"
 #include "switch.h"
 #include "WiShield/WiShield.h"
@@ -8,6 +8,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include "rtc/RTClib.h"
+#include "menusystem/MenuSystem.h"
 
 
 uint16_t t = 0;
@@ -15,14 +16,14 @@ uint8_t colorbars[8];
 int8_t bcnt = 0;
 RTC_DS1307 RTC;
 
-volatile bool DEBUG=false;
+void setupMenu(menu::MenuSystem &m);
 
 int main() {
-  setupDisplay();
+  menu::MenuSystem m;
+  setupMenu(m);
+  DISP.begin();
   setupSwitch();
   RTC.begin();
-
-  uint16_t stop=0;
 
   char mystring[21];
   struct pt p;
@@ -31,19 +32,19 @@ int main() {
   long int num = 0;
   DateTime d = RTC.now();
   uint32_t b = d.unixtime();
-  while(PT_SCHEDULE(WiFi_init(&p))) {
-	  while(switchBuffersFlag);
+  while(PT_SCHEDULE(WiFi.run(&p))) {
+	  while(DISP.flushing());
 	  if (buttonPressed(SW_RIGHT)) num++;
 	  if (buttonPressed(SW_LEFT)) num--;
 	  if (buttonPressed(SW_UP)) num*=2;
 	  if (buttonPressed(SW_DOWN)) num/=2;
 	  if (buttonPressed(SW_PUSH)) num=0;
-	  clearBuffer(drawBuffer);
+	  DISP.clearBuffer();
 	  d = RTC.now();
 	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, getCurrent_ms()/(d.unixtime()-b), d.hour(), d.minute(), d.second());
-	  drawString(drawBuffer, 8, mystring);
+	  DISP.drawString(8, mystring);
 //	  scrollString(drawBuffer, mystring, getCurrent_ms()/40);
-	  colorBar(drawBuffer, red);
+	  DISP.colorBar(red);
 /*	  
 	  clearBuffer(drawBuffer);
 	  scrollString(drawBuffer, "setting up wifi", getCurrent_ticks()/50);
@@ -51,7 +52,7 @@ int main() {
 	  switchBuffersFlag = 1;
 */
 
-
+	  volatile uint8_t *drawBuffer = DISP.getDrawBuffer();
 	  drawBuffer[0]=0;
 	  drawBuffer[14*XRES/8]=0;
 	  drawBuffer[3*XRES/8]=0b01111111;
@@ -70,36 +71,15 @@ int main() {
 	  	drawBuffer[(32+i-7)*XRES/8]=0b11111000;
 	  }
 		
-	  switchBuffersFlag = 1;
+	  DISP.flush();
   }
+}
 
-  PT_INIT(&p);
-  while(PT_SCHEDULE(WiFi_run(&p))) {
-	  if (DEBUG) continue;
-	  while(switchBuffersFlag);
-	  clearBuffer(drawBuffer);
-	  if (!stop)  {
-	  }
-	  else stop--;
-/*
-	  char bChar=0;
-
-	  if (switchPressed(SW_F_UP)) bChar = 'U';
-	  if (switchPressed(SW_F_DOWN)) bChar = 'D';
-	  if (switchPressed(SW_F_LEFT)) bChar = 'L';
-	  if (switchPressed(SW_F_RIGHT)) bChar = 'R';
-	  if (switchPressed(SW_F_PUSH)) bChar = 'P';
-	  if (bChar =='L') { *mystring=(--bcnt)+'0'; stop = 200; }
-	  else if (bChar =='R') { *mystring=(++bcnt)+'0'; stop = 200; }
-	  else if (bChar =='P') { *mystring=(bcnt)+'0'; stop = 200; }
-	  else if (bChar) { *mystring = bChar; stop = 200; }
-*/
-
-//	  scrollString(drawBuffer, mystring, getCurrent_ticks()/50);
-	  drawString(drawBuffer, 0, mystring);
-	  getCopperBars( colorbars, t/4 );
-	  colorBar(drawBuffer, colorbars);
-	  switchBuffersFlag = 1;
-	  t++;
-  }
+void setupMenu(menu::MenuSystem &m) {
+	menu::Menu mm("");
+	menu::TextItem mm_mi1("Level 1 - Item 1");
+	menu::TextItem mm_mi2("Level 1 - Item 2");
+	menu::Menu mu1("Level 1 - Item 3 (Menu)");
+	menu::Menu mu1_mi1("Level 2 - Item 1");
+	mm.add_item(&mm_mi1);
 }

@@ -13,26 +13,31 @@
 #define COL_CLK 4
 #define COL_D 1
 
-extern volatile uint8_t *drawBuffer;
-extern volatile uint8_t switchBuffersFlag;
-inline void _getCurrent_ticks(uint32_t *ticks) {
-	extern volatile uint32_t current_ticks;
-	extern volatile uint8_t current_ticks_lock;
-	uint8_t l;
-	do {
-		l = current_ticks_lock;
-		*ticks = current_ticks;
-	} while (l!=current_ticks_lock);
-}
-inline uint32_t getCurrent_ms(void) {
-	uint32_t t; _getCurrent_ticks(&t);
-	return t;
-}
 
-void setupDisplay(void);
-void clearBuffer(volatile uint8_t *buffer);
-signed char drawString(volatile uint8_t *buffer, signed char pos, const char *string);
-void getCopperBars(uint8_t *color, uint16_t t);
-void colorBar(volatile uint8_t *buffer, const uint8_t *color);
+class LEDDisplay {
+	private:
+	void drawChar(signed char &pos, uint8_t charIdx);
+	public:
+	void begin(void);
+	void clearBuffer();
+	signed char drawString(signed char pos, const char *string);
+	void scrollString(const char *string, int16_t counter);
+	void getCopperBars(uint8_t *color, uint16_t t);
+	void colorBar(const uint8_t *color);
+	inline volatile uint8_t *getDrawBuffer() {
+		extern volatile uint8_t *drawBuffer;
+		return drawBuffer;
+	}
+	inline void flush(void) {
+		extern volatile bool switchBuffersFlag;
+		switchBuffersFlag = true;
+	}
+	inline bool flushing(void) {
+		extern volatile bool switchBuffersFlag;
+		return switchBuffersFlag;
+	}
+};
+
+extern LEDDisplay DISP;
 
 #endif // DISPLAY_H

@@ -42,7 +42,7 @@
 
 #include "clock-arch.h"
 
-#include "display.h"
+#include "display_timer.h"
 
 clock_time_t clock_time()
 {

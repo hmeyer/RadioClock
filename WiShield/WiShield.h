@@ -39,14 +39,21 @@
 extern "C" {
 	#include "config.h"
 	#include "spi.h"
-	extern unsigned char webclient_get(char *host, unsigned int port, char *file);
 }
 
 #include "pt.h"
 
-PT_THREAD( WiFi_init(struct pt *pt) );
-PT_THREAD( WiFi_run(struct pt *pt) );
-void WiFi_run_old();
 
+class wifi {
+	public:
+	wifi():m_connected(false) {};
+	PT_THREAD( init(struct pt *pt) );
+	PT_THREAD( run(struct pt *pt) );
+	bool connected() { return m_connected; }
+	private:
+	bool m_connected;
+};
+
+extern wifi WiFi;
 
 #endif /* WISHIELD_H_ */
