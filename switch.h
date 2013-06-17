@@ -7,12 +7,18 @@
 
 #define SW_PIN 5
 
-#define SW_UP 1
-#define SW_DOWN 4
-#define SW_LEFT 0
-#define SW_RIGHT 2
-#define SW_PUSH 3
-
+namespace sw {
+enum Button {
+	up = 1,
+	down = 4,
+	left = 0,
+	first = 0,
+	right = 2,
+	center = 3,
+	none = 6,
+	last = none
+};
+}
 extern volatile uint8_t buttonBuffer;
 extern volatile uint8_t _buttonPressed;
 
@@ -38,12 +44,19 @@ inline void updateButton(uint8_t flag) {
 	}
 }
 
-inline bool buttonPressed(uint8_t b) {
+inline bool buttonPressed(sw::Button b) {
 	if (_buttonPressed & _BV(b)) {
 		_buttonPressed &= ~_BV(b);
 		return true;
 	}
 	return false;
+}
+
+inline sw::Button getButton() {
+	sw::Button b = sw::first;
+	while( (b != sw::last) 
+		&& !buttonPressed(b)) b=static_cast<sw::Button>(1+(int)b);
+	return b;
 }
 
 #endif

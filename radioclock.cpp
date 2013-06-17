@@ -16,11 +16,17 @@ uint8_t colorbars[8];
 int8_t bcnt = 0;
 RTC_DS1307 RTC;
 
-void setupMenu(menu::MenuSystem &m);
+//void setupMenu(menu::MenuSystem &m);
 
 int main() {
-  menu::MenuSystem m;
-  setupMenu(m);
+  Menu m("");
+  Menu m_bssid("bssid"); m.addChild( m_bssid );
+  Menu m_password("password"); m.addChild( m_password );
+  Menu m_date_time("Date & Time"); m.addChild( m_date_time );
+  Menu m_date("date"); m_date_time.addChild( m_date );
+  Menu m_time("time"); m_date_time.addChild( m_time );
+  Item *menu = &m;
+
   DISP.begin();
   setupSwitch();
   RTC.begin();
@@ -34,16 +40,20 @@ int main() {
   uint32_t b = d.unixtime();
   while(PT_SCHEDULE(WiFi.run(&p))) {
 	  while(DISP.flushing());
-	  if (buttonPressed(SW_RIGHT)) num++;
-	  if (buttonPressed(SW_LEFT)) num--;
-	  if (buttonPressed(SW_UP)) num*=2;
-	  if (buttonPressed(SW_DOWN)) num/=2;
-	  if (buttonPressed(SW_PUSH)) num=0;
 	  DISP.clearBuffer();
+	  menu = menu->interact( getButton() );
+	  menu->repaint();
+/*
+	  if (buttonPressed(sw::right)) num++;
+	  if (buttonPressed(sw::left)) num--;
+	  if (buttonPressed(sw::up)) num*=2;
+	  if (buttonPressed(sw::down)) num/=2;
+	  if (buttonPressed(sw::center)) num=0;
 	  d = RTC.now();
 	  sprintf(mystring, "%ld %ld %02d:%02d:%02d", num, getCurrent_ms()/(d.unixtime()-b), d.hour(), d.minute(), d.second());
 	  DISP.drawString(8, mystring);
 //	  scrollString(drawBuffer, mystring, getCurrent_ms()/40);
+*/
 	  DISP.colorBar(red);
 /*	  
 	  clearBuffer(drawBuffer);
@@ -75,6 +85,7 @@ int main() {
   }
 }
 
+/*
 void setupMenu(menu::MenuSystem &m) {
 	menu::Menu mm("");
 	menu::TextItem mm_mi1("Level 1 - Item 1");
@@ -83,3 +94,4 @@ void setupMenu(menu::MenuSystem &m) {
 	menu::Menu mu1_mi1("Level 2 - Item 1");
 	mm.add_item(&mm_mi1);
 }
+*/

@@ -1,98 +1,39 @@
-/*
-  MenuSystem.h - Library for creating menu structures.
-  Created by Jon Black, August 8th 2011.
-  Released into the public domain.
-
-  License: LGPL 3
-*/
-
-#include <inttypes.h>
-
 #ifndef MENUSYSTEM_H
 #define MENUSYSTEM_H
 
+#include <inttypes.h>
+#include "switch.h"
 
-#define MAX_MENU_ITEMS 5
+class Menu;
 
-namespace menu {
-
-class Component
+class Item
 {
 public:
-    Component(char* name);
-    char* get_name() const;
-    virtual Component *select() = 0;
+    Item(char *n);
+    virtual Item *interact(sw::Button b) = 0;
+    virtual void repaint() = 0;
+    void addSibling(Item &s);
 protected:
-    char* _name;
+    char *name;
+    Item *parent;
+    Item *prev;
+    Item *next;
+    friend Menu;
 };
 
-
-class Item : public Component
+class Menu: public Item
 {
 public:
-    Item(char* name);
-    virtual Component *select()=0;
-};
-
-class TextItem : public Item
-{
-public:
-    TextItem(char* name);
-    virtual Component *select();
+	Menu(char *name);
+	void addChild(Item &c);
+    	virtual Item *interact(sw::Button b);
+	virtual void repaint();
+protected:
+	Item *currentChild;
 };
 
 
-class Menu : public Component
-{
-public:
-    Menu(char* name);
 
-    bool next(bool loop=false);
-    bool prev(bool loop=false);
-    Component *activate();
-    virtual Component *select();
-
-    void add_item(Item* pItem);
-    Menu const* add_menu(Menu* pMenu);
-
-    void set_parent(Menu* pParent);
-    Menu const* get_parent() const;
-
-    Component const *get_selected() const;
-    Component const* get_menu_component(uint8_t index) const;
-
-    uint8_t get_num_menu_components() const;
-    uint8_t get_cur_menu_component_num() const;
-
-private:
-    Component* _p_sel_menu_component;
-    Component* _menu_components[MAX_MENU_ITEMS];
-    Menu* _p_parent;
-    uint8_t _num_menu_components;
-    uint8_t _cur_menu_component_num;
-};
-
-
-class MenuSystem
-{
-public:
-    MenuSystem();
-
-    bool next(bool loop=false);
-    bool prev(bool loop=false);
-    void select();
-    bool back();
-
-    void set_root_menu(Menu* p_root_menu);
-
-    Menu const* get_current_menu() const;
-
-private:
-    Menu* _p_root_menu;
-    Menu* _p_curr_menu;
-};
-
-}
 
 
 #endif
