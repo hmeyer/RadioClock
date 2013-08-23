@@ -18,7 +18,7 @@ protected:
     Item *parent;
     Item *prev;
     Item *next;
-    friend Menu;
+    friend class Menu;
 };
 
 class Menu: public Item
