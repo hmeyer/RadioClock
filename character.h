@@ -3,7 +3,6 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include "charset.h"
 
 extern const unsigned char characters[] PROGMEM;
 inline const uint8_t charset(uint8_t c, uint8_t line) { return pgm_read_byte(&(characters[(c<<3)+line])); }

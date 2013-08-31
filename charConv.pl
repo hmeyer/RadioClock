@@ -11,10 +11,9 @@ open (my $file, '<',$filename);
 my $content=join("",(<$file>));
 close $file;
 
-print "#ifndef CHARSET_H\n";
-print "#define CHARSET_H\n";
 print "#include <avr/io.h>\n";
 print "#include <avr/pgmspace.h>\n";
+print "extern const unsigned char characters[] PROGMEM;\n";
 print "const unsigned char characters[] = {\n";
 
 my @names=();
@@ -48,7 +47,6 @@ while($content=~m/(^|\n)Character\(([^\)]+)/g){
 
 
 print "};\n";
-print "#endif\n";
 
 sub getbit{
      my $s=shift;

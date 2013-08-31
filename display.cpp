@@ -147,6 +147,22 @@ void LEDDisplay::scrollString(const char *string, int16_t counter) {
 }
 
 
+void LEDDisplay::plot(uint32_t x, uint8_t y, uint8_t red, uint8_t green){
+	volatile uint8_t *drawBuffer = DISP.getDrawBuffer();
+	if(x<1) return;
+	if(y<1) return;
+	if(x>64) return;
+	if(y>8) return;
+	x-=1;
+	y-=1;
+	drawBuffer[       (y<<4) +      (x>>3) ] |= red   << ((63-x) & 7);
+	//drawBuffer[4*XRES+(y<<4) +      (x>>3) ] |= red   << ((63-x) & 7);
+	drawBuffer[       (y<<4) + 8 +  (x>>3) ] |= green << ((63-x) & 7);
+	//drawBuffer[4*XRES+(y<<4) + 8 +  (x>>3) ] |= green << ((63-x) & 7);
+
+}
+
+
 inline void setDisplayTimer(uint16_t cycles) {
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
     OCR1A = cycles;
@@ -189,6 +205,7 @@ void LEDDisplay::begin(void) {
   initDisplayTimer();
   wdt_enable( WDTO_15MS );
 }
+
 
 
 

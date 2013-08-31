@@ -24,6 +24,7 @@ class LEDDisplay {
 	void scrollString(const char *string, int16_t counter);
 	void getCopperBars(uint8_t *color, uint16_t t);
 	void colorBar(const uint8_t *color);
+	void plot(uint32_t x, uint8_t y, uint8_t red, uint8_t green);
 	inline volatile uint8_t *getDrawBuffer() {
 		extern volatile uint8_t *drawBuffer;
 		return drawBuffer;
@@ -35,6 +36,10 @@ class LEDDisplay {
 	inline bool flushing(void) {
 		extern volatile bool switchBuffersFlag;
 		return switchBuffersFlag;
+	}
+	inline void waitUntilFlushed(void) {
+		extern volatile bool switchBuffersFlag;
+		while(switchBuffersFlag==true);
 	}
 };
 

@@ -20,7 +20,7 @@
 
 PROGRAM		= radioclock
 WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS_C	= radioclock.o display.o myspi.o wiring.o switch.o wifi.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o menusystem/MenuSystem.o
+OBJECTS_C	= radioclock.o display.o charset.o cosine.o myspi.o wiring.o switch.o wifi.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o menusystem/MenuSystem.o
 OBJECTS_ASM	= #i2cmaster/i2cmaster.o
 OBJECTS		= $(OBJECTS_C) $(OBJECTS_ASM)
 DEVICE		= atmega328p
@@ -80,7 +80,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(OBJECTS:.o=.lst) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.h dep.make
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(OBJECTS:.o=.lst) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.cpp dep.make
 
 # file targets:
 %.hex: %.elf
@@ -89,13 +89,13 @@ clean:
 $(PROGRAM).elf: $(OBJECTS)
 	$(COMPILE) -o $@ $^ $(LDFLAGS)
 
-dep.make: charset.h
+dep.make: charset.cpp
 	$(CXX) $(CXXFLAGS) -MM $(OBJECTS_C:.o=.c*) > $@
 
 include dep.make
 
-charset.h: charset.txt
-	./charConv.pl charset.txt > charset.h
+charset.cpp: charset.txt
+	./charConv.pl charset.txt > charset.cpp
 
 #display.o: display.cpp charset.h
 %.o: %.S

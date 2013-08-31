@@ -7,7 +7,7 @@
 *.map
 *.elf
 *.hex
-charset.h
+charset.cpp
 dep.make
 *~
 /.cproject
