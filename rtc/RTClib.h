@@ -1,3 +1,5 @@
+#ifndef RTCLIB_H
+#define RTCLIB_H
 // Code by JeeLabs http://news.jeelabs.org/code/
 // Released to the public domain! Enjoy!
 
@@ -45,3 +47,7 @@ public:
 protected:
     static long offset;
 };
+
+extern RTC_DS1307 RTC;
+
+#endif

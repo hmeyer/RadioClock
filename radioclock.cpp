@@ -16,7 +16,6 @@
 uint16_t t = 0;
 uint8_t colorbars[8];
 int8_t bcnt = 0;
-RTC_DS1307 RTC;
 
 //void setupMenu(menu::MenuSystem &m);
 
@@ -45,8 +44,8 @@ int main() {
   struct pt p;
   PT_INIT(&p);
 
-  while(1){
-  	  PT_SCHEDULE(WiFi.run(&p));
+  while(PT_SCHEDULE(WiFi.run(&p))) {
+
 	  DISP.waitUntilFlushed();
 	  
 	  DISP.clearBuffer();
@@ -146,6 +145,7 @@ int main() {
 	  	  DISP.drawString(8, "connect");
 	  }
 	*/
+	
 	 DISP.flush();
   }
 }

@@ -106,15 +106,15 @@ void socket_app_appcall(void)
 static int handle_connection(struct socket_app_state *s)
 {
   PSOCK_BEGIN(&s->p);
-//  PSOCK_SEND_STR(&s->p, "Hello. What is you name?\n");
+  PSOCK_SEND_STR(&s->p, "Hello.\n");
   uint8_t res = 1;
-  while(res) {
+//  while(res) {
   PSOCK_READTO(&s->p, '\n');
   res = handleCommand(s->inputbuffer);
   PSOCK_SEND_STR(&s->p, s->inputbuffer);
   PSOCK_SEND_STR(&s->p, "\n$ ");
   memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
-  }
+//  }
   PSOCK_CLOSE(&s->p);
   PSOCK_END(&s->p);
 }
