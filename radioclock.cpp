@@ -45,15 +45,15 @@ int main() {
   struct pt p;
   PT_INIT(&p);
 
-  PT_SCHEDULE(WiFi.run(&p));
   while(1){
+  	  PT_SCHEDULE(WiFi.run(&p));
 	  DISP.waitUntilFlushed();
 	  
-	  volatile uint8_t *drawBuffer = DISP.getDrawBuffer();
+	  //volatile uint8_t *drawBuffer = DISP.getDrawBuffer();
 	  DISP.clearBuffer();
-  	  for(uint8_t i=0;i < 2*XRES;i++) drawBuffer[4*XRES+i]=0;
+  	  //for(uint8_t i=0;i < 2*XRES;i++) drawBuffer[4*XRES+i]=0;
 
-	  d = RTC.now();
+	  //d = RTC.now();
 
 	  //menu = menu->interact( getButton() );
 	  //menu->repaint();
@@ -77,6 +77,7 @@ int main() {
 	  //DISP.scrollString("wifi", getCurrent_ms()/100);
 
 	  // show uptime
+	/*
 	  if(second!=d.second()) c++;
 	  second=d.second();
 	  sprintf(mystring, "%lu", c);
@@ -99,7 +100,7 @@ int main() {
 	    DISP.plot(d.second(),y ,1,0);
 	    DISP.plot(d.second(),9-y ,1,0);
 	  }
-
+	*/
 
 	  //show unixtime
 	  //sprintf(mystring, "%lu", d.unixtime());
@@ -107,6 +108,7 @@ int main() {
 
 	  //DISP.scrollString("test", getCurrent_ms()/20);
 	  
+	 /*  
 	  if (WiFi.connected()){
 		  drawBuffer[0]=0;
 		  drawBuffer[14*XRES/8]=0;
@@ -136,14 +138,14 @@ int main() {
 		DISP.plot(round(4.5+1.0*sint),round(4.5+1.0*cost), 1,0);
 	 }
 	DISP.colorBar(rainbow);
-
-	/*
+	*/
+	
 	  if (WiFi.connected()){
 		  DISP.drawString(8, "connected");
           }else{
 	  	  DISP.drawString(8, "connect");
 	  }
-	*/
+	
 	 DISP.flush();
   }
 }
