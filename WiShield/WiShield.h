@@ -47,7 +47,6 @@ extern "C" {
 class wifi {
 	public:
 	wifi():m_connected(false) {};
-	PT_THREAD( init(struct pt *pt) );
 	PT_THREAD( run(struct pt *pt) );
 	bool connected() { return m_connected; }
 	private:
