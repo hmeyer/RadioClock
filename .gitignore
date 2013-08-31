@@ -8,6 +8,7 @@
 *.elf
 *.hex
 charset.cpp
+wifi.cpp
 dep.make
 *~
 /.cproject
