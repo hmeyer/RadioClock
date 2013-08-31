@@ -97,9 +97,7 @@ PT_THREAD( wifi::run(struct pt *pt) )
 	WiFi_initPre();
 	PT_WAIT_WHILE(pt, WiFi_initLoop());
 	WiFi_initPost();
-	PT_END(pt);
 	m_connected = true;
-	PT_BEGIN(pt);
 	static uint32_t ms;
 	while(1) {
 		stack_process();
