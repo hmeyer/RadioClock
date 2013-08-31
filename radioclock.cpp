@@ -89,13 +89,13 @@ int main() {
 	  double t=getCurrent_ms()/10;
 	  for (int x=10; x<=32;x++){
 	    double u=t/50.0+x*6.26/20.0;
-	    DISP.plot(x,round(4.5+ 4.0*sin(u)), 1,0);
-	    DISP.plot(x,round(4.5+ 4.0*cos(u)), 0,1);
+	    DISP.plot(x,round(4+ 4.0*sin(u)), 1,0);
+	    DISP.plot(x,round(4+ 4.0*cos(u)), 0,1);
 	  }
 	  //show seconds bar
-          for (int y=1; y<=2; y++){
+          for (int y=0; y<=2; y++){
 	    DISP.plot(d.second(),y ,1,0);
-	    DISP.plot(d.second(),9-y ,1,0);
+	    DISP.plot(d.second(),7-y ,1,0);
 	  }
 	
 
@@ -132,9 +132,9 @@ int main() {
 		double sint=sin(t);
 		double cost=cos(t);
 		//DISP.plot(round(4.5+4.0*sint),round(4.5+4.0*cost), 1,0);
-		DISP.plot(round(4.5+3.0*sint),round(4.5+3.0*cost), 1,0);
-		DISP.plot(round(4.5+2.0*sint),round(4.5+2.0*cost), 1,0);
-		DISP.plot(round(4.5+1.0*sint),round(4.5+1.0*cost), 1,0);
+		DISP.plot(round(4+3.0*sint),round(4+3.0*cost), 1,0);
+		DISP.plot(round(4+2.0*sint),round(4+2.0*cost), 1,0);
+		DISP.plot(round(4+1.0*sint),round(4+1.0*cost), 1,0);
 		DISP.colorBar(rainbow);
 	 }
 	
