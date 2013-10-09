@@ -164,7 +164,7 @@ void RadioEvent::showCurrentEvent(bool isWifiConnected){
 			(diff&1)&&(diff>=0)&&(diff<=10)
 		)blink();
 
-	/*
+	
 	} else if (isMessage){
 		disableVideo();
 		display.setBorder(0,XRES);
@@ -176,7 +176,7 @@ void RadioEvent::showCurrentEvent(bool isWifiConnected){
 		enableVideo();
 		if(isVideoEnabled()) display.copyBuffer((uint8_t*)message);
 		
-	*/		
+			
 	}else{
 		disableVideo();
 		//show time

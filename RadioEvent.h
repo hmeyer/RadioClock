@@ -11,8 +11,8 @@
 #define MONTH 30*DAY
 #define YEAR 365*DAY
 
-#define MAX_EVENTS 3
-#define NAME_LENGTH 10
+#define MAX_EVENTS 10
+#define NAME_LENGTH 20
 #define LINE_LENGTH 130
 
 

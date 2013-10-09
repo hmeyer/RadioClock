@@ -12,7 +12,7 @@ use Encode;
 # sudo apt-get install libnet-telnet-perl libtime-hires-perl libdatetime-perl
 $|=1;
 
-my $host='192.168.179.101';
+my $host='192.168.178.100';
 my $port='1000';
 my $time_zone='Europe/Berlin';
 my $video_path='/home/milan/radio/radiouhr/video/';
