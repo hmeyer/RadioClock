@@ -47,7 +47,6 @@
 #include "uip.h"
 #include <string.h> 
 #include "netcommandc.h"
-
 /*
  * Declaration of the protosocket function that handles the connection
  * (defined at the end of the code).
@@ -86,7 +85,11 @@ void socket_app_appcall(void)
    * the protosocket in our applications' state structure.
    */
   if(uip_connected()) {
-    PSOCK_INIT(&s->p, s->inputbuffer, sizeof(s->inputbuffer));
+    //memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
+    PSOCK_INIT(&s->p, (uint8_t*)s->inputbuffer, 
+	SOCKET_BUFFER_LENGTH
+//	sizeof((uint8_t*)s->inputbuffer)
+    );
   }
 
   /*
@@ -106,15 +109,26 @@ void socket_app_appcall(void)
 static int handle_connection(struct socket_app_state *s)
 {
   PSOCK_BEGIN(&s->p);
-  PSOCK_SEND_STR(&s->p, "Hello.\n");
-  uint8_t res = 1;
-//  while(res) {
-  PSOCK_READTO(&s->p, '\n');
-  res = handleCommand(s->inputbuffer);
-  PSOCK_SEND_STR(&s->p, s->inputbuffer);
-  PSOCK_SEND_STR(&s->p, "\n$ ");
-  memset(s->inputbuffer, 0x00, sizeof(s->inputbuffer));
-//  }
+  while(1){
+	PSOCK_READTO(&s->p, '\n');
+	if(*s->inputbuffer=='q'){
+		/*
+		memset(s->inputbuffer, 0x00, SOCKET_BUFFER_LENGTH
+		//			sizeof((uint8_t*)s->inputbuffer)
+		);
+		snprintf(s->inputbuffer, 8, "bye\n");
+		PSOCK_SEND_STR(&s->p, (unsigned char*)s->inputbuffer);
+		*/
+		PSOCK_SEND_STR(&s->p, "\n");
+		break;
+	}
+	handleCommand(s->inputbuffer);
+	PSOCK_SEND_STR(&s->p, (uint8_t*)s->inputbuffer);
+	memset(s->inputbuffer, 0x00, 
+		SOCKET_BUFFER_LENGTH
+		//sizeof((uint8_t*)s->inputbuffer)
+	);
+  }
   PSOCK_CLOSE(&s->p);
   PSOCK_END(&s->p);
 }

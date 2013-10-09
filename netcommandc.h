@@ -1,7 +1,6 @@
 #ifndef NETCOMMANDC_H
 #define NETCOMMANDC_H
 
-uint8_t handleCommand(char *cmd);
-
+void handleCommand(char *cmd);
 
 #endif

@@ -98,6 +98,7 @@ DateTime::DateTime () {
         case 'O': m = 10; break;
         case 'N': m = 11; break;
         case 'D': m = 12; break;
+	//default : m = 1; break;
     }
     d = conv2d(__DATE__ + 4);
     hh = conv2d(__TIME__);

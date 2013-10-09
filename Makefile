@@ -20,7 +20,8 @@
 
 PROGRAM		= radioclock
 WISHIELD_OBJS	= WiShield.o g2100.o stack.o uip.o network.o uip_arp.o socketapp.o psock.o timer.o clock-arch.o
-OBJECTS_C	= radioclock.o display.o charset.o cosine.o myspi.o wiring.o switch.o wifi.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o menusystem/MenuSystem.o debug.o
+OBJECTS_C	= radioclock.o display.o charset.o cosine.o myspi.o wiring.o switch.o wifi.o $(WISHIELD_OBJS:%=WiShield/%) netcommand.o rtc/RTClib.o i2cmaster/wire.o i2cmaster/twimaster.o RadioEvent.o
+#menusystem/MenuSystem.o debug.o 
 OBJECTS_ASM	= #i2cmaster/i2cmaster.o
 OBJECTS		= $(OBJECTS_C) $(OBJECTS_ASM)
 DEVICE		= atmega328p
@@ -49,7 +50,9 @@ ALL_ASFLAGS = -mmcu=$(DEVICE) -I. -x assembler-with-cpp $(ASFLAGS)
 
 CXX = avr-g++
 CC = avr-gcc
-ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I. -funsigned-char -funsigned-bitfields -fpack-struct
+#added -fno-strict-aliasing to avoid warnings
+ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I. -funsigned-char -funsigned-bitfields -fpack-struct -fno-strict-aliasing
+#ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -I. -funsigned-char -funsigned-bitfields -fpack-struct 
 CXXFLAGS = $(ALLCFLAGS)
 CFLAGS = $(ALLCFLAGS) -std=c99
 COMPILE = $(CXX) $(CXXFLAGS)

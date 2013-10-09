@@ -102,8 +102,9 @@ PT_THREAD( wifi::run(struct pt *pt) )
 	while(1) {
 		stack_process();
 		zg_drv_process();
-		ms =  getCurrent_ms()+20;
-		PT_WAIT_UNTIL(pt, (ms>=20)?(getCurrent_ms() > ms):(getCurrent_ms()>ms && getCurrent_ms()<0xff00) );
+		ms =  getMilliSeconds()+20;
+		PT_WAIT_UNTIL(pt, (ms>=20)?(getMilliSeconds() > ms):(getMilliSeconds()>ms && getMilliSeconds()<0xff00) );
+		//PT_WAIT_UNTIL(pt, (ms>=20)?(getMilliSeconds() > ms):(getMilliSeconds()-0x80000000>ms-0x80000000) );
 	}
 	PT_END(pt);
 }

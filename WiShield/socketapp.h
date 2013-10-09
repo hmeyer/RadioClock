@@ -35,6 +35,8 @@
 #ifndef __SOCKET_APP_H__
 #define __SOCKET_APP_H__
 
+#define SOCKET_BUFFER_LENGTH 130
+
 /* Since this file will be included by uip.h, we cannot include uip.h
    here. But we might need to include uipopt.h if we need the u8_t and
    u16_t datatypes. */
@@ -47,8 +49,7 @@
    for each TCP connection. */
 typedef struct socket_app_state {
   struct psock p;
-  char inputbuffer[20];
-  char name[20];
+  char inputbuffer[SOCKET_BUFFER_LENGTH];
 } uip_tcp_appstate_t;
 
 /* Finally we define the application function to be called by uIP. */

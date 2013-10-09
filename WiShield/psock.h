@@ -158,6 +158,7 @@ void psock_init(struct psock *psock, unsigned char *buffer, unsigned int buffers
 #define PSOCK_BEGIN(psock) PT_BEGIN(&((psock)->pt))
 
 PT_THREAD(psock_send(struct psock *psock, const unsigned char *buf, unsigned int len));
+//PT_THREAD(psock_send(struct psock *psock, unsigned char *buf, unsigned int len));
 /**
  * Send data.
  *

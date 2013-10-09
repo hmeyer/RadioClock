@@ -12,7 +12,7 @@ inline void _getCurrent_ticks(uint32_t *ticks) {
 		*ticks = current_ticks;
 	} while (l!=current_ticks_lock);
 }
-inline uint32_t getCurrent_ms(void) {
+inline uint32_t getMilliSeconds(void) {
 	uint32_t t; _getCurrent_ticks(&t);
 	return t;
 }
