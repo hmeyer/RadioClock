@@ -106,28 +106,17 @@ void socket_app_appcall(void)
  * explicitly return - all return statements are hidden in the PSOCK
  * macros.
  */
-static int handle_connection(struct socket_app_state *s)
-{
+static int handle_connection(struct socket_app_state *s){
   PSOCK_BEGIN(&s->p);
   while(1){
 	PSOCK_READTO(&s->p, '\n');
 	if(*s->inputbuffer=='q'){
-		/*
-		memset(s->inputbuffer, 0x00, SOCKET_BUFFER_LENGTH
-		//			sizeof((uint8_t*)s->inputbuffer)
-		);
-		snprintf(s->inputbuffer, 8, "bye\n");
-		PSOCK_SEND_STR(&s->p, (unsigned char*)s->inputbuffer);
-		*/
 		PSOCK_SEND_STR(&s->p, "\n");
 		break;
 	}
-	handleCommand(s->inputbuffer);
-	PSOCK_SEND_STR(&s->p, (uint8_t*)s->inputbuffer);
-	memset(s->inputbuffer, 0x00, 
-		SOCKET_BUFFER_LENGTH
-		//sizeof((uint8_t*)s->inputbuffer)
-	);
+	handleCommand(s->inputbuffer, s->outputbuffer);
+	memset(s->inputbuffer, 0x00, SOCKET_BUFFER_LENGTH);
+	PSOCK_SEND_STR(&s->p, s->outputbuffer);
   }
   PSOCK_CLOSE(&s->p);
   PSOCK_END(&s->p);

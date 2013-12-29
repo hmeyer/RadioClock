@@ -26,13 +26,31 @@ while($content=~m/(^|\n)Character\(([^\)]+)/g){
      my $name="c_".sprintf('%03d',$char_count);
      push @names,$name;
 
-
      my @vals=();
+     my $size=0;
+     for my $line (@lines){
+         if ($line=~/\"([^\"]+)/){
+             my $val=$1;
+		if(length($line)!=7){
+			print STDERR "ALERT: $char_count ".length($line)." ".$line."\n";
+		}
+
+	     $size=5 if(getbit($val,4) && ($size<5));
+	     $size=4 if(getbit($val,3) && ($size<4));
+             $size=3 if(getbit($val,2) && ($size<3));
+             $size=2 if(getbit($val,1) && ($size<2));
+             $size=1 if(getbit($val,0) && ($size<1));
+         }
+     }
+     $size=1 if($size==0);
+     $size++;
+     push @vals2, '0x'.sprintf('%02x',$size);
+
      for my $line (@lines){
          if ($line=~/\"([^\"]+)/){
              my $val=$1;
              $val=
-                ( getbit($val,0) <<7 )
+               ( getbit($val,0) <<7 )
              | ( getbit($val,1) <<6 )
              | ( getbit($val,2) <<5 )
              | ( getbit($val,3) <<4 )
@@ -44,6 +62,7 @@ while($content=~m/(^|\n)Character\(([^\)]+)/g){
      print join(', ',@vals).$lines[0]."\n";
      $char_count++;
 }
+print ",".join(', ',@vals2).$lines[0]."\n";
 
 
 print "};\n";

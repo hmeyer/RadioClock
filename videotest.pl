@@ -2,7 +2,7 @@
 
 # avconv -i /media/daten/video_produktion/firecops/heroin-640x360x160x2000_17.avi -s 64x8 -vcodec v410 -an -y test.avi
 # avconv -i oSCX78-8-q0.mp4 -s 64x8 -vcodec v410 -an -y test.avi
-# avconv -s 100x50 -vcodec bmp -an -y test.avi -i input
+# avconv -s 100x50 -vcodec bmp -an -y test.avi -i test.mpg
 use Encode;
 use Data::Dumper;
 use Time::HiRes qw(time);
@@ -136,7 +136,8 @@ sub draw_image{
 		my $gline=$glines->[$ypos];
 		my $bline=$blines->[$ypos];
 		for (my $x=0;$x<$width;$x++){
-			$pos=$colorByte*(int($x)+int($y*$width));
+			#$pos=$colorByte*(int($x)+int($y*$width));
+			$pos=$colorByte*(int(($x+$width)/2)+int($y*$width));
 			my $or=(ord(substr($image,$offset+$pos  ,1)));
 			my $og=(ord(substr($image,$offset+$pos+1,1)));
 			my $ob=(ord(substr($image,$offset+$pos+2,1)));

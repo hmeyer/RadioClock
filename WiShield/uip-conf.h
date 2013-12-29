@@ -85,7 +85,7 @@ typedef unsigned short uip_stats_t;
 /**
  * uIP buffer size.
  *
- * \hideinitializer
+ * \hideinitializer stable settings:400
  */
 #define UIP_CONF_BUFFER_SIZE     400
 /**

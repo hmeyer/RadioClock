@@ -44,15 +44,18 @@ extern "C" {
 #include "pt.h"
 
 
-class wifi {
+class Wifi {
 	public:
-	wifi():m_connected(false) {};
-	PT_THREAD( run(struct pt *pt) );
+	Wifi():m_connected(false) {};
+	PT_THREAD( run(struct pt *pt, struct timer *timer) );
+	void reconnect(void);
+	void restartStack(void);
 	bool connected() { return m_connected; }
+	uint32_t cycles;
 	private:
 	bool m_connected;
 };
 
-extern wifi WiFi;
+extern Wifi wifi;
 
 #endif /* WISHIELD_H_ */

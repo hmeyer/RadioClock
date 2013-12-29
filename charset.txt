@@ -9,18 +9,18 @@ Character( // 32 = SP
 "     "
 ),
 Character( // 33 = !
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
 "     "
-"  X  "
+"X    "
 "     "
 ),
 Character( // 34 = "
-" X X "
-" X X "
+"X X  "
+"X X  "
 "     "
 "     "
 "     "
@@ -61,7 +61,7 @@ Character( // 37 = %
 Character( // 38 = &
 " XXX "
 "X   X"
-"X   X "
+"X   X"
 " XXX "
 "X X X"
 "X  X "
@@ -69,8 +69,8 @@ Character( // 38 = &
 "     "
 ),
 Character( // 39 = '
-"  X  "
-"  X  "
+"X    "
+"X    "
 "     "
 "     "
 "     "
@@ -79,13 +79,13 @@ Character( // 39 = '
 "     "
 ),
 Character( // 40 = (
-"   XX"
-"  X  "
-"  X  "
+"  XX "
 " X   "
-"  X  "
-"  X  "
-"   XX"
+" X   "
+"X    "
+" X   "
+" X   "
+"  XX "
 "     "
 ),
 Character( // 41 = klammer zu
@@ -125,14 +125,14 @@ Character( // 44 = ,
 "     "
 "     "
 "     "
-"  X  "
-"  X  "
+"X    "
+"X    "
 ),
 Character( // 45 = -
 "     "
 "     "
 "     "
-"XXXXX"
+" XXX "
 "     "
 "     "
 "     "
@@ -145,17 +145,17 @@ Character( // 46 = .
 "     "
 "     "
 "     "
-"  X  "
+"X    "
 "     "
 ),
 Character( // 47 = /
 "     "
-"   X "
-"   X "
 "  X  "
 "  X  "
 " X   "
 " X   "
+"X    "
+"X    "
 "     "
 ),
 Character( // 48 = 0
@@ -165,8 +165,8 @@ Character( // 48 = 0
 "X  X "
 "X  X "
 "X  X "
-"X  X "
 "XXXX "
+"     "
 ),
 Character( // 49 = 1
 "   X "
@@ -176,7 +176,7 @@ Character( // 49 = 1
 "   X "
 "   X "
 "   X "
-"   X "
+"     "
 ),
 Character( // 50 = 2
 "XXXX "
@@ -185,8 +185,8 @@ Character( // 50 = 2
 "XXXX "
 "X    "
 "X    "
-"X    "
 "XXXX "
+"     "
 ),
 Character( // 51 = 3
 "XXXX "
@@ -195,8 +195,8 @@ Character( // 51 = 3
 "XXXX "
 "   X "
 "   X "
-"   X "
 "XXXX "
+"     "
 ),
 Character( // 52 = 4
 "X  X "
@@ -206,7 +206,7 @@ Character( // 52 = 4
 "   X "
 "   X "
 "   X "
-"   X "
+"     "
 ),
 Character( // 53 = 5
 "XXXX "
@@ -215,8 +215,8 @@ Character( // 53 = 5
 "XXXX "
 "   X "
 "   X "
-"   X "
 "XXXX "
+"     "
 ),
 Character( // 54 = 6
 "XXXX "
@@ -225,8 +225,8 @@ Character( // 54 = 6
 "XXXX "
 "X  X "
 "X  X "
-"X  X "
 "XXXX "
+"     "
 ),
 Character( // 55 = 7
 "XXXX "
@@ -236,7 +236,7 @@ Character( // 55 = 7
 "   X "
 "   X "
 "   X "
-"   X "
+"     "
 ),
 Character( // 56 = 8
 "XXXX "
@@ -245,8 +245,8 @@ Character( // 56 = 8
 "XXXX "
 "X  X "
 "X  X "
-"X  X "
 "XXXX "
+"     "
 ),
 Character( // 57 = 9
 "XXXX "
@@ -255,15 +255,15 @@ Character( // 57 = 9
 "XXXX "
 "   X "
 "   X "
-"   X "
 "XXXX "
+"     "
 ),
 Character( // 58 = :
 "     "
 "     "
-"  X  "
+"X    "
 "     "
-"  X  "
+"X    "
 "     "
 "     "
 "     "
@@ -273,27 +273,27 @@ Character( // 59 = ;
 "     "
 "     "
 "     "
-"  X  "
+"X    "
 "     "
-"  X  "
-"  x  "
+"X    "
+"x    "
 ),
 Character( // 60 = <
-"    X"
 "   X "
 "  X  "
 " X   "
+"X    "
+" X   "
 "  X  "
 "   X "
-"    X"
 "     "
 ),
 Character( // 61 = =
 "     "
 "     "
-"XXXXX"
+" XXX "
 "     "
-"XXXXX"
+" XXX "
 "     "
 "     "
 "     "
@@ -345,17 +345,17 @@ Character( // 66 = B
 "XXXX "
 "X  X "
 "X  X "
-"XXXX "
+"XXX  "
 "     "
 ),
 Character( // 67 = C
-" XXX "
-" X   "
-" X   "
-" X   "
-" X   "
-" X   "
-" XXX "
+"XXX  "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
+"XXX  "
 "     "
 ),
 Character( // 68 = D
@@ -369,23 +369,23 @@ Character( // 68 = D
 "     "
 ),
 Character( // 69 = E
-" XXX "
-" X   "
-" X   "
-" XXX "
-" X   "
-" X   "
-" XXX "
+"XXX  "
+"X    "
+"X    "
+"XXX  "
+"X    "
+"X    "
+"XXX  "
 "     "
 ),
 Character( // 70 = F
-" XXX "
-" X   "
-" X   "
-" XXX "
-" X   "
-" X   "
-" X   "
+"XXX  "
+"X    "
+"X    "
+"XXX  "
+"X    "
+"X    "
+"X    "
 "     "
 ),
 Character( // 71 = G
@@ -409,13 +409,13 @@ Character( // 72 = H
 "     "
 ),
 Character( // 73 = I
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
 "     "
 ),
 Character( // 74 = J
@@ -479,10 +479,10 @@ Character( // 79 = O
 "     "
 ),
 Character( // 80 = P
-"XXXX "
+"XXX  "
 "X  X "
 "X  X "
-"XXXX "
+"XXX  "
 "X    "
 "X    "
 "X    "
@@ -509,23 +509,23 @@ Character( // 82 = R
 "     "
 ),
 Character( // 83 = S
-" XXX "
-" X   "
-" X   "
-" XXX "
-"   X "
-"   X "
-" XXX "
+"XXX  "
+"X    "
+"X    "
+"XXX  "
+"  X  "
+"  X  "
+"XXX  "
 "     "
 ),
 Character( // 84 = T
-" XXX "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
+"XXX  "
+" X   "
+" X   "
+" X   "
+" X   "
+" X   "
+" X   "
 "     "
 ),
 Character( // 85 = U
@@ -635,12 +635,12 @@ Character( // 95 = _
 "     "
 "     "
 "     "
-"XXXXX"
+" XXX "
 "     "
 ),
 Character( // 96 = '
-"  X  "
-"  X  "
+"X    "
+"X    "
 "     "
 "     "
 "     "
@@ -695,17 +695,17 @@ Character( // 101 = e
 "X  X "
 "XXXX "
 "X    "
-"XXXX " 
+"XXXX "
 "     "
 ),
 Character( // 102 = f
-" XX  "
-" X   "
-" Xf  "
-" X   "
-" X   "
-" X   "
-" X   "
+"XX   "
+"X    "
+"Xf   "
+"X    "
+"X    "
+"X    "
+"X    "
 "     "
 ),
 Character( // 103 = g
@@ -729,24 +729,24 @@ Character( // 104 = h
 "     "
 ),
 Character( // 105 = i
-"  X  "
+"X    "
 "     "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
 "     "
 ),
 Character( // 106 = j
-"  X  "
+" X   "
 "     "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-"  X  "
-" XX  "
+" X   "
+" X   "
+" X   "
+" X   "
+" X   "
+"XX   "
 ),
 Character( // 107 = k
 "X    "
@@ -759,13 +759,13 @@ Character( // 107 = k
 "     "
 ),
 Character( // 108 = l
-" X   "
-" X   "
-" X   "
-" X   "
-" X   "
-" X   "
-" XX  "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
+"X    "
+"XX   "
 "     "
 ),
 Character( // 109 = m
@@ -791,11 +791,11 @@ Character( // 110 = n
 Character( // 111 = o
 "     "
 "     "
-"XXXX "
+" XX  "
 "X  x "
 "X  x "
 "X  x "
-"XXXX "
+" XX  "
 "     "
 ),
 Character( // 112 = p
@@ -821,11 +821,11 @@ Character( // 113 = q
 Character( // 114 = r
 "     "
 "     "
-" XX  "
-" X   "
-" X   "
-" X   "
-" X   "
+"XX   "
+"X    "
+"X    "
+"X    "
+"X    "
 "     "
 ),
 Character( // 115 = s
@@ -901,11 +901,11 @@ Character( // 121 = y
 Character( // 122 = z
 "     "
 "     "
-" XXX "
-"   X "
+"XXX  "
 "  X  "
 " X   "
-" XXX "
+"X    "
+"XXX  "
 "     "
 ),
 Character( // 123 = {

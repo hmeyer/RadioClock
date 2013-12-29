@@ -1,0 +1,9 @@
+/var/log/radioclock/*.log {
+  copytruncate
+  compress
+  rotate 5
+  size 1M
+  missingok
+  notifempty
+  sharedscripts
+}

@@ -50,16 +50,17 @@ ALL_ASFLAGS = -mmcu=$(DEVICE) -I. -x assembler-with-cpp $(ASFLAGS)
 
 CXX = avr-g++
 CC = avr-gcc
-#added -fno-strict-aliasing to avoid warnings
-ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -fno-tree-loop-optimize -I. -funsigned-char -funsigned-bitfields -fpack-struct -fno-strict-aliasing
-#ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -finline-limit=3 -I. -funsigned-char -funsigned-bitfields -fpack-struct 
+#ALLCFLAGS = -save-temps -Wall -g -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I. -finline-limit=3 -I. -funsigned-char -funsigned-bitfields -fno-strict-aliasing 
+ALLCFLAGS = -save-temps -fverbose-asm -Wall -g -O1 -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I. -ffunction-sections -fno-move-loop-invariants -fno-tree-loop-optimize -fno-tree-ter
+
 CXXFLAGS = $(ALLCFLAGS)
 CFLAGS = $(ALLCFLAGS) -std=c99
 COMPILE = $(CXX) $(CXXFLAGS)
 COMPILEC = $(CC) $(CFLAGS)
 
 # Linker options
-LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
+#LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref 
+LDFLAGS	= -Wl,-Map=$(PROGRAM).map -Wl,--cref -Wl,--gc-sections -Wl,--relax
 
 # Add size command so we can see how much space we are using on the target device.
 SIZE	= avr-size -C --mcu=$(DEVICE)
@@ -83,7 +84,7 @@ fuse:
 install: flash fuse
 
 clean:
-	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(OBJECTS:.o=.lst) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.cpp dep.make
+	rm -f $(PROGRAM).hex $(PROGRAM).elf $(OBJECTS) $(OBJECTS:.o=.d) $(OBJECTS:.o=.ii) $(OBJECTS:.o=.s) $(OBJECTS:.o=.lst) $(PROGRAM).lst $(PROGRAM).map $(WISHIELD_OBJS:%.o=%.ii) $(WISHIELD_OBJS:%.o=%.i) $(WISHIELD_OBJS:%.o=%.s) charset.cpp dep.make *.i *.s *.ii
 
 # file targets:
 %.hex: %.elf

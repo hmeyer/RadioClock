@@ -7,15 +7,11 @@
 
 #define DS1307_ADDRESS 0x68
 #define SECONDS_PER_DAY 86400L
-
 #define SECONDS_FROM_1970_TO_2000 946684800
 
-
-#define ZERO 0//The new wire library needs to take an int when you are sending for the zero register
-////////////////////////////////////////////////////////////////////////////////
-// utility code, some of this could be exposed in the DateTime API if needed
-
-const uint8_t daysInMonth [] PROGMEM = { 31,28,31,30,31,30,31,31,30,31,30,31 }; //has to be const or compiler compaints
+const uint8_t daysInMonth [] PROGMEM = {
+	31,28,31,30,31,30,31,31,30,31,30,31
+}; //has to be const or compiler compaints
 
 // number of days since 2000/01/01, valid for 2001..2099
 static uint16_t date2days(uint16_t y, uint8_t m, uint8_t d) {
@@ -132,11 +128,9 @@ uint8_t RTC_DS1307::begin(void) {
 }
 
 
-#if (ARDUINO >= 100)
-
 uint8_t RTC_DS1307::isrunning(void) {
   Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(i);	
+  Wire.write(0);	
   Wire.endTransmission();
 
   Wire.requestFrom(DS1307_ADDRESS, 1);
@@ -146,7 +140,7 @@ uint8_t RTC_DS1307::isrunning(void) {
 
 void RTC_DS1307::adjust(const DateTime& dt) {
     Wire.beginTransmission(DS1307_ADDRESS);
-    Wire.write(i);
+    Wire.write(0);
     Wire.write(bin2bcd(dt.second()));
     Wire.write(bin2bcd(dt.minute()));
     Wire.write(bin2bcd(dt.hour()));
@@ -154,13 +148,13 @@ void RTC_DS1307::adjust(const DateTime& dt) {
     Wire.write(bin2bcd(dt.day()));
     Wire.write(bin2bcd(dt.month()));
     Wire.write(bin2bcd(dt.year() - 2000));
-    Wire.write(i);
+    Wire.write(0);
     Wire.endTransmission();
 }
 
 DateTime RTC_DS1307::now() {
   Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(i);	
+  Wire.write(0);	
   Wire.endTransmission();
   
   Wire.requestFrom(DS1307_ADDRESS, 7);
@@ -173,65 +167,6 @@ DateTime RTC_DS1307::now() {
   uint16_t y = bcd2bin(Wire.read()) + 2000;
   
   return DateTime (y, m, d, hh, mm, ss);
-}
-
-#else
-
-uint8_t RTC_DS1307::isrunning(void) {
-  Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(ZERO);	
-  Wire.endTransmission();
-
-  Wire.requestFrom(DS1307_ADDRESS, 1);
-  uint8_t ss = Wire.read();
-  return !(ss>>7);
-}
-
-void RTC_DS1307::adjust(const DateTime& dt) {
-    Wire.beginTransmission(DS1307_ADDRESS);
-    Wire.write(ZERO);
-    Wire.write(bin2bcd(dt.second()));
-    Wire.write(bin2bcd(dt.minute()));
-    Wire.write(bin2bcd(dt.hour()));
-    Wire.write(bin2bcd(0));
-    Wire.write(bin2bcd(dt.day()));
-    Wire.write(bin2bcd(dt.month()));
-    Wire.write(bin2bcd(dt.year() - 2000));
-    Wire.write(ZERO);
-    Wire.endTransmission();
-}
-
-DateTime RTC_DS1307::now() {
-  Wire.beginTransmission(DS1307_ADDRESS);
-  Wire.write(ZERO);	
-  Wire.endTransmission();
-  
-  Wire.requestFrom(DS1307_ADDRESS, 7);
-  uint8_t ss = bcd2bin(Wire.read() & 0x7F);
-  uint8_t mm = bcd2bin(Wire.read());
-  uint8_t hh = bcd2bin(Wire.read());
-  Wire.read();
-  uint8_t d = bcd2bin(Wire.read());
-  uint8_t m = bcd2bin(Wire.read());
-  uint16_t y = bcd2bin(Wire.read()) + 2000;
-  
-  return DateTime (y, m, d, hh, mm, ss);
-}
-
-#endif
-
-
-////////////////////////////////////////////////////////////////////////////////
-// RTC_Millis implementation
-
-long RTC_Millis::offset = 0;
-
-void RTC_Millis::adjust(const DateTime& dt) {
-    offset = dt.unixtime();
-}
-
-DateTime RTC_Millis::now() {
-  return (uint32_t)(offset);
 }
 
 RTC_DS1307 RTC;

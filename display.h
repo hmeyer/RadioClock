@@ -3,8 +3,15 @@
 
 #include <stdint.h>
 #include "rtc/RTClib.h"
+#include <util/atomic.h>
+//#include "debug.h"
 
 #define XRES 64
+#define YRES 8
+#define MAX_FRAMES 2
+#define FRAME_SIZE 2*XRES
+#define LINE_SIZE FRAME_SIZE/8
+
 #define ROW_ST 16
 #define ROW_D 15
 #define ROW_CP 14
@@ -14,117 +21,132 @@
 #define COL_CLK 4
 #define COL_D 1
 
-#define MAX_FRAMES 3
+#define BLACK   0
+#define RED     1
+#define GREEN   2
+#define YELLOW  3
 
-#define RED     3
-#define GREEN  12
-#define YELLOW 15
+#define round(x) int(x+0.5)
 
-class LEDDisplay {
+
+class LedDisplay {
 	private:
-	uint8_t textColor;
-	int8_t  scrollSpeed;
-	uint8_t leftBorder;
-	uint8_t rightBorder;
-	int16_t brightness;
+	volatile uint8_t displayBuff[MAX_FRAMES * FRAME_SIZE];
+	volatile uint8_t drawBuff   [MAX_FRAMES * FRAME_SIZE];
+	volatile uint8_t red;
+	volatile uint8_t green;
+	volatile uint8_t leftBorder;
+	volatile uint8_t rightBorder;
 
 	public:
+	volatile uint8_t  frame;
+	volatile uint8_t  scrollSpeed;
+	volatile uint16_t brightness;
+	volatile uint8_t  lock;
+	volatile bool     waitClear;
+	volatile bool     switchBuffer;
+	volatile uint8_t  *displayBuffer;
+	volatile uint8_t  *drawBuffer;
 
+	void init(void);
 
-	void begin(void);
-
-	void clearBuffer();
-
-	int16_t drawChar(char character, int16_t pos);
-	int8_t drawNumber(int8_t pos, uint8_t number, bool leadingZero, bool align);
-
-	inline void setTextColor(uint8_t color){
-		textColor=color;
+	inline void setColor(uint8_t color){
+		if (color==RED){
+			red=1;
+			green=0;
+		}else if (color==GREEN){
+			red=0;
+			green=1;
+		}else if (color==YELLOW){
+			red=1;
+			green=1;
+		}else {
+			red=0;
+			green=0;
+		}
 	}
 
-	inline void setScrollSpeed(uint8_t speed){
-		scrollSpeed=speed;
-	}
-	inline uint8_t getScrollSpeed(){
-		return scrollSpeed;
-	}
 
-	inline void resetBorder(){
-		leftBorder=0;
-		rightBorder=XRES;
-	}
+	void    clearBuffer();
+	uint8_t drawChar(const char character, const int16_t pos);
+	uint8_t drawNumber(const int16_t pos, const uint8_t number, const bool leadingZero, const bool align);
+	uint8_t getCharWidth(const char c);
 
-	inline void setBorder(uint8_t left, uint8_t right){
-		leftBorder=left;
-		rightBorder=right;
-	}
+	uint16_t getStringSize(const char *string);
+	int16_t drawString(volatile int16_t pos, const char *string);
+	void    drawStringCenter(const char *string);
 
-	int16_t drawString(int16_t pos, const char *string);
-
-	int8_t printDate(int8_t pos, uint8_t hour, uint8_t minute, uint8_t second);
-	int8_t printDuration(int8_t pos, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+	int16_t printDate(int16_t pos);
+	int16_t printDuration(int16_t pos, const uint8_t day, const uint8_t hour, const uint8_t minute, const uint8_t second);
 
 	void scrollString(const char *string);
 
-	//void getCopperBars(uint8_t *color, uint16_t t);
-	//void colorBar(const uint8_t *color);
+	inline void setScrollSpeed(const uint8_t speed){
+		scrollSpeed=speed;
+	}
+
+	void blink();
+
+	void showProgressBar(uint8_t progress);
+
+	inline void resetBorder(){
+		leftBorder=0;
+		rightBorder=XRES-1;
+	}
+
+	inline void setBorder(const uint8_t left, const uint8_t right){
+		if(left>right)return;
+		if((left>=0) and (left<XRES))  leftBorder=left;
+		if((right>=0) and (right<XRES)) rightBorder=right;
+	}
 
 	void rotateStar();
-	//void softScreen();
 
-	inline void plot(int8_t x, int8_t y);
-	inline void plot(int8_t x, int8_t y, int8_t red, int8_t green);
+	void plot(const int16_t x, const int16_t y);
 
-	inline uint8_t getColor(int8_t x, int8_t y, int8_t colorChannel);
-	inline uint8_t getRed(int8_t x, int8_t y);
-	inline uint8_t getGreen(int8_t x, int8_t y);
-
-	void copyBuffer(uint8_t *line);
-
-	inline volatile uint8_t *getDrawBuffer() {
-		extern volatile uint8_t *drawBuffer;
-		return drawBuffer;
-	}
-
-	inline volatile uint8_t *getDisplayBuffer() {
-		extern volatile uint8_t *displayBuffer;
-		return displayBuffer;
-	}
+	void copyBuffer(const char *line);
 
 	inline void flush(void) {
-		extern volatile bool switchBuffersFlag;
-		switchBuffersFlag = true;
+		switchBuffer = true;
 	}
 	inline bool flushing(void) {
-		extern volatile bool switchBuffersFlag;
-		return switchBuffersFlag;
+		return switchBuffer;
 	}
 	inline void waitUntilFlushed(void) {
-		extern volatile bool switchBuffersFlag;
-		while(switchBuffersFlag==true);
+		while(switchBuffer==true);
 	}
 
-	inline void setBrightness(uint8_t i){
-		if((i>=0)&&(i<MAX_FRAMES)) brightness=i*2*XRES;
+	inline void switchBuffers(void){
+		//ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+			volatile uint8_t  *temp;
+			temp              = drawBuffer;
+			drawBuffer        = displayBuffer;
+			displayBuffer     = temp;
+		//}
 	}
 
-	inline uint8_t getBrightness(){
-		return brightness;
+	inline void setBrightness(const uint8_t i){
+		if((i>=0) and (i<MAX_FRAMES-1)){
+			clearBuffer();
+			brightness=i*FRAME_SIZE;
+		}
 	}
 
 	inline void increaseBrightness(){
-		clearBuffer();
-		if(brightness<MAX_FRAMES*2*XRES-1) brightness+=2*XRES;
+		if(brightness<((MAX_FRAMES-1)*FRAME_SIZE)){
+			clearBuffer();
+			brightness+=FRAME_SIZE;
+		}
 	}
 
 	inline void decreaseBrightness(){
-		clearBuffer();
-		if(brightness>0) brightness-=2*XRES;
+		if(brightness>0){
+			clearBuffer();
+			brightness-=FRAME_SIZE;
+		}
 	}
-
-
 };
 
-extern LEDDisplay display;
+extern LedDisplay display;
 
 #endif // DISPLAY_H

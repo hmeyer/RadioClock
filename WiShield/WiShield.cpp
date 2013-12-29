@@ -48,7 +48,7 @@ extern "C" {
 #include <avr/interrupt.h>
 #include "display_timer.h"
 
-wifi WiFi;
+Wifi wifi;
 
 template <class T> const T& min (const T& a, const T& b) {
 	  return !(b<a)?a:b;     // or: return !comp(b,a)?a:b; for version (2)
@@ -91,28 +91,37 @@ inline void WiFi_initPost() {
 	stack_init();
 }
 
-PT_THREAD( wifi::run(struct pt *pt) )
-{
+void Wifi::reconnect(void) {
+	m_connected = false;
+}
+
+void Wifi::restartStack(void) {
+	stack_init();
+}
+
+PT_THREAD( Wifi::run(struct pt *pt, struct timer *timer)  ){
 	PT_BEGIN(pt);
+	m_connected = false;
 	WiFi_initPre();
 	PT_WAIT_WHILE(pt, WiFi_initLoop());
 	WiFi_initPost();
 	m_connected = true;
-	static uint32_t ms;
-	while(1) {
+	
+	while(m_connected) {
 		stack_process();
 		zg_drv_process();
-		ms =  getMilliSeconds()+20;
-		PT_WAIT_UNTIL(pt, (ms>=20)?(getMilliSeconds() > ms):(getMilliSeconds()>ms && getMilliSeconds()<0xff00) );
-		//PT_WAIT_UNTIL(pt, (ms>=20)?(getMilliSeconds() > ms):(getMilliSeconds()-0x80000000>ms-0x80000000) );
+		timer_set(timer, 2);
+		PT_WAIT_UNTIL(pt, timer_expired(timer));
+		//PT_WAIT_UNTIL(pt, 1);
+		cycles++;
+		//PT_YIELD(pt);
 	}
 	PT_END(pt);
 }
 
 #if defined USE_DIG8_INTR && !defined APP_WISERVER
 // PCINT0 interrupt vector
-ISR(PCINT0_vect)
-{
+ISR(PCINT0_vect){
 	zg_isr();
 }
 

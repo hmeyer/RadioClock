@@ -34,14 +34,16 @@
 
 #ifndef __SOCKET_APP_H__
 #define __SOCKET_APP_H__
-
-#define SOCKET_BUFFER_LENGTH 130
+//stable settings: 300 / 50
+#define SOCKET_BUFFER_LENGTH 300
+#define SOCKET_OUTPUT_BUFFER_LENGTH 100
 
 /* Since this file will be included by uip.h, we cannot include uip.h
    here. But we might need to include uipopt.h if we need the u8_t and
    u16_t datatypes. */
 #include "uipopt.h"
 #include "psock.h"
+#include "timer.h"
 
 /* Next, we define the uip_tcp_appstate_t datatype. This is the state
    of our application, and the memory required for this state is
@@ -50,6 +52,7 @@
 typedef struct socket_app_state {
   struct psock p;
   char inputbuffer[SOCKET_BUFFER_LENGTH];
+  char outputbuffer[SOCKET_OUTPUT_BUFFER_LENGTH];
 } uip_tcp_appstate_t;
 
 /* Finally we define the application function to be called by uIP. */

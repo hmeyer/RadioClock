@@ -6,25 +6,29 @@
 
 class NetCommand{
 	public:
-		void handleCommand(char *cmd);
-		uint32_t parse_number(char *line);
-		void inline clear_line(char *line);
-		void setEvent(char *line);
-		void getEvent(char *line);
-		void getSettings(char *line);
-		inline void setMessage(char *line);
-		inline void getMessage(char *line);
-		inline void setUnixTime(char *line);
-		inline void getUnixTime(char *line);
-		inline void setScrollSpeed(char *line);
-		inline void getScrollSpeed(char *line);
-		inline void drawImage(char *line, uint8_t brightness);
-		void setVideoPermission(char *line);
-		inline void isVideoEnabled(char *line);
-		inline void setVideoRequest(char *line);
-		inline void getVideo(char *line);
-		inline void setBrightness(char *line);
-		inline void getBrightness(char *line);
+		void handleCommand(const char *cmd, char *out);
+
+	private:
+		const char* cmd;
+		char* output;
+
+		uint32_t parse_number(uint8_t &pos);
+		void printOk();
+		void setEvent();
+		void getEvent();
+		void getSettings();
+		inline void setMessage();
+
+		inline void setUnixTime();
+		inline void getUnixTime();
+		inline void setScrollSpeed();
+		inline void drawImage(uint8_t brightness);
+		inline void setVideoRequest();
+		inline void isVideoEnabled();
+		inline void enableVideo();
+		inline void disableVideo();
+		inline void setBrightness();
+		inline void getSystemStart();
 };
 
 extern NetCommand Commander;
